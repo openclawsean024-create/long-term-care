@@ -67,6 +67,15 @@
 - 「預覽 SOS 流程」只開啟安全提示 modal，不撥號、不碰電話 API。
 - 個案卡可切換選取狀態，主時間線更新為對應 mock 個案。
 
+## 5.1 國際產品化要求
+
+- 所有核心畫面以 locale-neutral data model 設計：日期、時間、時區、姓名格式與緊急電話不可寫死在元件內。
+- Header 顯示 workspace、角色、語言、時區、同步狀態與資料來源；讓跨機構／跨地區使用者知道「看到的是什麼資料」。
+- 將「狀態」分成 `healthy / attention / action required / emergency` 四級；顏色只做輔助，文字與 icon 必須同時存在。
+- 桌面端採 command board；手機端把「下一個服務」與「快速紀錄」固定在可觸及區，避免縮小桌面表格。
+- UI copy 以短句、可翻譯、避免台灣特有縮寫為原則；繁中是目前 prototype locale，英文切換先展示資訊架構。
+- 不使用競品品牌、圖像或文案；只吸收其公開產品能力，保留本案「同一條照護脈絡跨角色共用」的差異化。
+
 ## 6. 不在這個原型中做
 
 - 正式 React component、資料庫、登入／RBAC、真實個資、推播、LINE、Email、GPS、電子簽名、醫療判讀與 SOS 實際撥號。
@@ -78,4 +87,3 @@
 - [Jubo 家屬即時溝通](https://www.jubo-health.com/features/jia-shu-ji-shi-gou-tong)
 - [Carecord 安心記 App Store](https://apps.apple.com/tw/app/carecord-%E5%AE%89%E5%BF%83%E8%A8%98-%E7%85%A7%E8%AD%B7%E7%B4%80%E9%8C%84/id6769324273)
 - [9Rise 行動健康科技](https://www.9rise.com/)
-

@@ -25,6 +25,7 @@
 - 建立 bounded M1 scope，明確禁止在安全設計前接真實個資與外部通知。
 - 記錄目前驗證命令、CI 路徑錯誤與技術棧版本漂移。
 - 完成競品對標、`PRD/UI-SPEC.md` 與獨立 `web/ui-prototype.html`；尚未進入正式 React。
+- 第二版改為 Careboard 國際產品方向：dark editorial shell、focus queue、resident context dock、locale／role／sync metadata；仍只使用 mock data。
 
 ## Deterministic checks（2026-09-24）
 
@@ -35,6 +36,8 @@
 | `cd web && npm run build` | 0 | Vite production build 完成 |
 | `cd web && npm run lint` | 1 | package script 尚未定義 |
 | `sync-3way.sh long-term-care --verify` | 2 | 缺 `gh` CLI 與 `VERCEL_TOKEN`，資料不完整 |
+
+Prototype static check：exit 0（required markers、inline JavaScript parse、`git diff --check`）。Codex in-app browser 不允許直接開啟本地 `file://`，因此尚未完成瀏覽器截圖級 QA。
 
 `npm install --no-package-lock` 本次安裝 100 packages；npm audit 回報 7 vulnerabilities（5 moderate、1 high、1 critical），需在依賴基線建立時另行處理，不以 `npm audit fix --force` 當作自動修復。
 

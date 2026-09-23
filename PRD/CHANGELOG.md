@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## International product direction / 2026-09-24
+
+- Reworked `web/ui-prototype.html` from a generic pastel dashboard into a Careboard command surface with a dark editorial shell, focus queue, resident context dock, care-network switching, locale/role controls, timezone metadata, and explicit local-only status.
+- Added productization requirements to `PRD/UI-SPEC.md`: locale-neutral data, status taxonomy, provenance/sync visibility, responsive role views, and translation-ready copy.
+
 ## UI prototype / 2026-09-24
 
 - Added `PRD/UI-SPEC.md` with competitor benchmark, M1 information architecture, visual system, and interaction boundaries.
