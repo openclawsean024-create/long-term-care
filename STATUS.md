@@ -24,6 +24,7 @@
 - 補齊專案層 `AGENTS.md`、`SOP.md`、`STATUS.md`。
 - 建立 bounded M1 scope，明確禁止在安全設計前接真實個資與外部通知。
 - 記錄目前驗證命令、CI 路徑錯誤與技術棧版本漂移。
+- 完成競品對標、`PRD/UI-SPEC.md` 與獨立 `web/ui-prototype.html`；尚未進入正式 React。
 
 ## Deterministic checks（2026-09-24）
 
@@ -41,4 +42,4 @@
 
 - 程式碼完成度：scaffold only；FR-001～FR-007 尚未實作。
 - Open Issues：至少 3 個已知治理／CI blocker（見 `SOP.md`）。
-- 下一步：Sean 覆審 M1 scope；接著由 Developer 修正 web toolchain 與測試基線，再開始 FR-001。
+- 下一步：Sean 覆審 UI prototype；確認後由 Developer 修正 web toolchain 與測試基線，再開始 FR-001。

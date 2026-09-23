@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f7f4" />
+    <title>長照安心管家｜M1 UI Prototype</title>
+    <style>
+      :root {
+        --canvas: #f6f7f4;
+        --surface: #ffffff;
+        --surface-soft: #eff5f1;
+        --ink: #18323a;
+        --muted: #6d7d7c;
+        --line: #e0e8e3;
+        --teal: #2c7a73;
+        --teal-dark: #205f5a;
+        --teal-pale: #dceee8;
+        --amber: #b76e21;
+        --amber-pale: #fff0d8;
+        --coral: #d95245;
+        --coral-pale: #ffe6e1;
+        --lavender: #735ca7;
+        --lavender-pale: #eee9fb;
+        --shadow: 0 18px 45px rgba(33, 63, 65, 0.07);
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 11px;
+        --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+      html { background: var(--canvas); }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--canvas);
+        font-family: var(--font);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      button, select { font: inherit; }
+      button { cursor: pointer; }
+      button:focus-visible, select:focus-visible { outline: 3px solid rgba(44, 122, 115, 0.28); outline-offset: 2px; }
+
+      .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        padding: 28px 18px 18px;
+        border-right: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.78);
+      }
+      .brand { display: flex; gap: 12px; align-items: center; padding: 0 10px; }
+      .brand-mark {
+        display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px;
+        color: white; background: var(--teal); box-shadow: 0 8px 16px rgba(44, 122, 115, 0.25);
+        font-weight: 800; letter-spacing: -0.08em;
+      }
+      .brand strong { display: block; font-size: 16px; letter-spacing: 0.03em; }
+      .brand span { display: block; color: var(--muted); font-size: 11px; }
+      .workspace-pill {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        margin: 0 4px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px;
+        background: var(--surface-soft); color: var(--teal-dark); font-size: 12px; font-weight: 700;
+      }
+      .workspace-pill i { width: 7px; height: 7px; border-radius: 50%; background: #4aa67e; box-shadow: 0 0 0 4px #d5eee0; }
+      .nav-label { padding: 0 12px; color: #9aa8a4; font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      .nav { display: grid; gap: 5px; }
+      .nav button {
+        display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 13px; border: 0;
+        border-radius: 12px; color: var(--muted); background: transparent; text-align: left; transition: .18s ease;
+      }
+      .nav button:hover { color: var(--ink); background: #f1f5f2; }
+      .nav button.active { color: var(--teal-dark); background: var(--teal-pale); font-weight: 800; }
+      .nav .glyph { display: grid; place-items: center; width: 22px; color: currentColor; font-size: 17px; }
+      .sidebar-spacer { flex: 1; }
+      .support-card { padding: 16px; border-radius: var(--radius-md); color: white; background: var(--ink); }
+      .support-card small { display: block; color: #a8c4bd; font-size: 11px; }
+      .support-card strong { display: block; margin: 7px 0 12px; font-size: 15px; }
+      .support-card button { border: 0; color: #d4f2e9; background: transparent; padding: 0; font-size: 12px; font-weight: 800; }
+
+      .main { min-width: 0; padding: 28px clamp(20px, 4vw, 56px) 38px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+      .breadcrumbs { color: var(--muted); font-size: 13px; }
+      .breadcrumbs strong { color: var(--ink); }
+      .top-actions { display: flex; align-items: center; gap: 10px; }
+      .role-select, .icon-button, .primary-button, .secondary-button {
+        min-height: 40px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--ink);
+      }
+      .role-select { padding: 0 12px; font-size: 13px; font-weight: 700; }
+      .icon-button { display: grid; place-items: center; width: 40px; padding: 0; color: var(--muted); font-size: 17px; }
+      .avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: #875a3d; background: #f1ddca; font-size: 13px; font-weight: 800; }
+      .hero { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+      .eyebrow { margin: 0 0 8px; color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+      h1, h2, h3, p { margin-top: 0; }
+      h1 { margin-bottom: 8px; font-size: clamp(28px, 3vw, 42px); line-height: 1.15; letter-spacing: -0.055em; }
+      .hero p { max-width: 570px; margin: 0; color: var(--muted); }
+      .hero-actions { display: flex; gap: 9px; flex-shrink: 0; }
+      .primary-button, .secondary-button { padding: 0 15px; font-weight: 800; }
+      .primary-button { border-color: var(--teal); color: white; background: var(--teal); }
+      .primary-button:hover { background: var(--teal-dark); }
+      .secondary-button { background: transparent; }
+
+      .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+      .metric-card { position: relative; overflow: hidden; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); box-shadow: 0 8px 22px rgba(33, 63, 65, .03); }
+      .metric-card::after { content: ""; position: absolute; right: -18px; bottom: -30px; width: 88px; height: 88px; border-radius: 50%; background: var(--teal-pale); opacity: .65; }
+      .metric-card.warning::after { background: var(--amber-pale); }
+      .metric-card.lavender::after { background: var(--lavender-pale); }
+      .metric-label { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 700; }
+      .metric-value { display: flex; align-items: baseline; gap: 5px; margin-top: 9px; font-size: 31px; font-weight: 850; letter-spacing: -.06em; }
+      .metric-value small { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: 0; }
+      .metric-foot { position: relative; z-index: 1; display: flex; align-items: center; gap: 7px; margin-top: 5px; color: var(--muted); font-size: 12px; }
+      .delta { color: var(--teal); font-weight: 800; }
+      .metric-card.warning .delta { color: var(--amber); }
+
+      .workspace-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .82fr); gap: 18px; align-items: start; }
+      .card { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); }
+      .timeline-card { min-height: 630px; padding: 23px 24px 18px; }
+      .section-head { display: flex; align-items: start; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+      .section-head h2 { margin-bottom: 3px; font-size: 18px; letter-spacing: -.03em; }
+      .section-head p { margin: 0; color: var(--muted); font-size: 12px; }
+      .live-dot { display: inline-flex; align-items: center; gap: 7px; color: var(--teal); font-size: 12px; font-weight: 800; }
+      .live-dot i { width: 7px; height: 7px; border-radius: 50%; background: #43a986; box-shadow: 0 0 0 4px #dff4eb; }
+      .filters { display: flex; gap: 7px; padding-bottom: 16px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+      .filter { padding: 7px 11px; border: 1px solid transparent; border-radius: 999px; color: var(--muted); background: #f3f6f4; white-space: nowrap; font-size: 12px; font-weight: 800; }
+      .filter.active { border-color: #b9ded4; color: var(--teal-dark); background: var(--teal-pale); }
+      .timeline { display: grid; gap: 0; padding-top: 6px; }
+      .timeline-item { display: grid; grid-template-columns: 54px 19px minmax(0, 1fr) auto; gap: 12px; min-height: 102px; }
+      .timeline-time { padding-top: 17px; color: var(--muted); font-size: 12px; font-weight: 800; text-align: right; }
+      .timeline-line { position: relative; display: flex; justify-content: center; }
+      .timeline-line::before { content: ""; position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+      .timeline-item:last-child .timeline-line::before { bottom: 50%; }
+      .timeline-icon { position: relative; z-index: 1; display: grid; place-items: center; width: 19px; height: 19px; margin-top: 16px; border: 4px solid white; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 1px #9dd4c7; }
+      .timeline-icon.amber { background: var(--amber); box-shadow: 0 0 0 1px #e9c58f; }
+      .timeline-icon.lavender { background: var(--lavender); box-shadow: 0 0 0 1px #c7b8e7; }
+      .timeline-body { padding: 14px 0 16px; border-bottom: 1px solid #eef2ef; }
+      .timeline-item:last-child .timeline-body { border-bottom: 0; }
+      .timeline-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 4px; font-weight: 800; }
+      .timeline-copy { margin: 0; color: var(--muted); font-size: 13px; }
+      .tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 7px; border-radius: 6px; color: var(--teal-dark); background: var(--teal-pale); font-size: 10px; font-weight: 850; }
+      .tag.amber { color: #8b571b; background: var(--amber-pale); }
+      .tag.lavender { color: #5e488d; background: var(--lavender-pale); }
+      .tag.coral { color: #a33b32; background: var(--coral-pale); }
+      .timeline-action { align-self: center; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: transparent; font-size: 11px; font-weight: 800; white-space: nowrap; }
+      .timeline-action:hover { color: var(--teal-dark); border-color: #a9d0c6; background: var(--teal-pale); }
+      .timeline-action.done { color: var(--teal-dark); border-color: #bddfd5; background: var(--teal-pale); }
+
+      .side-stack { display: grid; gap: 18px; }
+      .side-card { padding: 21px; }
+      .side-card h3 { margin-bottom: 3px; font-size: 16px; letter-spacing: -.025em; }
+      .side-card > p { margin-bottom: 16px; color: var(--muted); font-size: 12px; }
+      .next-visit { padding: 15px; border: 1px solid #c5e1d8; border-radius: var(--radius-md); background: var(--surface-soft); }
+      .visit-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; }
+      .visit-time { color: var(--teal-dark); font-size: 22px; font-weight: 850; letter-spacing: -.05em; }
+      .visit-status { padding: 5px 8px; border-radius: 7px; color: var(--teal-dark); background: #d6eee6; font-size: 10px; font-weight: 850; }
+      .person-row { display: flex; align-items: center; gap: 10px; }
+      .person-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; color: #81563d; background: #f2dfcc; font-size: 12px; font-weight: 850; }
+      .person-row strong { display: block; font-size: 13px; }
+      .person-row span { display: block; color: var(--muted); font-size: 11px; }
+      .visit-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; padding-top: 13px; border-top: 1px solid #d3e7e0; }
+      .visit-detail span { display: block; color: var(--muted); font-size: 10px; }
+      .visit-detail strong { display: block; margin-top: 2px; font-size: 12px; }
+      .attention-list { display: grid; gap: 10px; }
+      .attention-item { display: flex; align-items: start; gap: 10px; padding: 11px 0; border-bottom: 1px solid #eef2ef; }
+      .attention-item:last-child { border-bottom: 0; }
+      .attention-bullet { flex: 0 0 auto; width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-pale); }
+      .attention-bullet.coral { background: var(--coral); box-shadow: 0 0 0 4px var(--coral-pale); }
+      .attention-item strong { display: block; font-size: 12px; }
+      .attention-item span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+      .network-list { display: grid; gap: 9px; }
+      .network-person { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; }
+      .network-person.selected { margin: 0 -8px; padding: 9px 8px; border-radius: 10px; background: var(--teal-pale); }
+      .network-person .person-row { min-width: 0; }
+      .network-person .person-row strong, .network-person .person-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .person-check { color: var(--teal); font-size: 13px; font-weight: 900; }
+
+      .prototype-note { display: flex; align-items: center; gap: 8px; margin-top: 17px; padding: 11px 13px; border: 1px dashed #b8cfc5; border-radius: 11px; color: #61736f; background: rgba(255,255,255,.5); font-size: 11px; }
+      .prototype-note strong { color: var(--teal-dark); }
+      .mobile-nav { display: none; }
+
+      .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: none; place-items: center; padding: 20px; background: rgba(24, 50, 58, .42); }
+      .modal-backdrop.open { display: grid; }
+      .modal { width: min(440px, 100%); padding: 25px; border-radius: 22px; background: white; box-shadow: 0 25px 70px rgba(24,50,58,.28); }
+      .modal h2 { margin-bottom: 7px; font-size: 21px; }
+      .modal p { color: var(--muted); font-size: 13px; }
+      .modal-warning { display: flex; gap: 11px; margin: 17px 0; padding: 13px; border-radius: 12px; color: #8b571b; background: var(--amber-pale); font-size: 12px; }
+      .modal-actions { display: flex; justify-content: end; gap: 9px; }
+
+      @media (max-width: 1050px) {
+        .app-shell { grid-template-columns: 76px minmax(0, 1fr); }
+        .sidebar { align-items: center; padding-inline: 12px; }
+        .brand { padding: 0; }
+        .brand > div:not(.brand-mark), .workspace-pill span, .nav-label, .nav button span:not(.glyph), .support-card { display: none; }
+        .workspace-pill { width: 34px; height: 34px; justify-content: center; padding: 0; }
+        .nav { width: 100%; }
+        .nav button { justify-content: center; padding-inline: 0; }
+        .nav .glyph { font-size: 18px; }
+        .workspace-grid { grid-template-columns: minmax(0, 1fr); }
+        .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .network-card { grid-column: span 2; }
+      }
+      @media (max-width: 720px) {
+        body { padding-bottom: 72px; }
+        .app-shell { display: block; }
+        .sidebar { display: none; }
+        .main { padding: 20px 16px 25px; }
+        .topbar { margin-bottom: 22px; }
+        .breadcrumbs { font-size: 12px; }
+        .top-actions .icon-button { display: none; }
+        .avatar { width: 34px; height: 34px; }
+        .hero { display: block; }
+        .hero-actions { margin-top: 18px; }
+        .hero-actions button { flex: 1; }
+        .metrics { gap: 9px; }
+        .metric-card { padding: 14px 12px; }
+        .metric-label { min-height: 34px; font-size: 11px; }
+        .metric-value { font-size: 24px; }
+        .metric-foot { display: block; font-size: 10px; }
+        .metric-foot .delta { display: block; }
+        .timeline-card { min-height: 0; padding: 19px 15px 12px; border-radius: 18px; }
+        .section-head { display: block; }
+        .live-dot { margin-top: 10px; }
+        .timeline-item { grid-template-columns: 40px 17px minmax(0, 1fr); gap: 8px; min-height: 112px; }
+        .timeline-time { font-size: 11px; }
+        .timeline-action { grid-column: 3; justify-self: start; align-self: start; margin-top: -5px; }
+        .side-stack { grid-template-columns: 1fr; }
+        .network-card { grid-column: auto; }
+        .mobile-nav { position: fixed; right: 12px; bottom: 12px; left: 12px; z-index: 5; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; padding: 7px; border: 1px solid var(--line); border-radius: 17px; background: rgba(255,255,255,.93); box-shadow: 0 14px 35px rgba(24,50,58,.14); backdrop-filter: blur(15px); }
+        .mobile-nav button { display: grid; gap: 2px; place-items: center; padding: 6px 2px; border: 0; border-radius: 11px; color: var(--muted); background: transparent; font-size: 10px; }
+        .mobile-nav button.active { color: var(--teal-dark); background: var(--teal-pale); font-weight: 800; }
+        .mobile-nav .glyph { font-size: 17px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主要導覽">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">照</div>
+          <div><strong>長照安心管家</strong><span>care, connected</span></div>
+        </div>
+        <div class="workspace-pill"><i aria-hidden="true"></i><span>本地展示資料</span><b>LOCAL</b></div>
+        <div>
+          <div class="nav-label">Workspace</div>
+          <nav class="nav" id="desktop-nav">
+            <button class="active" data-view="overview"><span class="glyph">⌂</span><span>今日總覽</span></button>
+            <button data-view="people"><span class="glyph">◉</span><span>個案</span></button>
+            <button data-view="schedule"><span class="glyph">▦</span><span>班表</span></button>
+            <button data-view="journal"><span class="glyph">≡</span><span>照護紀錄</span></button>
+            <button data-view="family"><span class="glyph">♡</span><span>家屬協作</span></button>
+          </nav>
+        </div>
+        <div class="sidebar-spacer"></div>
+        <div class="support-card">
+          <small>今日照護節奏</small>
+          <strong>資料同步前，先照顧好一件事。</strong>
+          <button id="sos-button">預覽 SOS 流程 →</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="breadcrumbs"><strong>照護工作台</strong> <span>／</span> 今日總覽</div>
+          <div class="top-actions">
+            <select class="role-select" id="role-select" aria-label="切換角色">
+              <option value="manager">照顧經理視角</option>
+              <option value="caregiver">照服員視角</option>
+              <option value="family">家屬視角</option>
+            </select>
+            <button class="icon-button" aria-label="通知">♧</button>
+            <div class="avatar" aria-label="使用者 Sean">SL</div>
+          </div>
+        </header>
+
+        <section class="hero">
+          <div>
+            <p class="eyebrow" id="hero-eyebrow">週三・09 月 24 日</p>
+            <h1 id="hero-title">早安，Sean。<br />今天一起把照護接好。</h1>
+            <p id="hero-copy">目前 4 位長輩都有安排，只有 2 件事需要你看一眼。先從需要處理的開始。</p>
+          </div>
+          <div class="hero-actions">
+            <button class="secondary-button" id="new-note">＋ 快速記錄</button>
+            <button class="primary-button" id="sos-button-main">預覽 SOS</button>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="今日指標">
+          <article class="metric-card">
+            <div class="metric-label"><span>今日服務完成率</span><span>08:42</span></div>
+            <div class="metric-value">78<small>%</small></div>
+            <div class="metric-foot"><span class="delta">↑ 12%</span> 比昨天順利</div>
+          </article>
+          <article class="metric-card warning">
+            <div class="metric-label"><span>待處理提醒</span><span>需留意</span></div>
+            <div class="metric-value">02<small>件</small></div>
+            <div class="metric-foot"><span class="delta">1 件待回覆</span> · 1 件排班衝突</div>
+          </article>
+          <article class="metric-card lavender">
+            <div class="metric-label"><span>家屬近況回覆</span><span>本週</span></div>
+            <div class="metric-value">91<small>%</small></div>
+            <div class="metric-foot"><span class="delta">↑ 8%</span> 互動比上週多</div>
+          </article>
+        </section>
+
+        <div class="workspace-grid">
+          <section class="card timeline-card" aria-labelledby="timeline-heading">
+            <div class="section-head">
+              <div><h2 id="timeline-heading">照護脈絡</h2><p id="timeline-subtitle">林秀琴・今天的每一個照顧，都在這裡接起來</p></div>
+              <div class="live-dot"><i aria-hidden="true"></i>近況已更新</div>
+            </div>
+            <div class="filters" role="tablist" aria-label="照護紀錄篩選">
+              <button class="filter active" data-filter="all">全部 <span>6</span></button>
+              <button class="filter" data-filter="service">服務 <span>2</span></button>
+              <button class="filter" data-filter="vital">量測 <span>1</span></button>
+              <button class="filter" data-filter="family">家屬 <span>2</span></button>
+            </div>
+            <div class="timeline" id="timeline" aria-live="polite"></div>
+          </section>
+
+          <aside class="side-stack" aria-label="今日側欄資訊">
+            <section class="card side-card">
+              <div class="section-head"><div><h3>下一個服務</h3><p>還有 38 分鐘</p></div><span class="tag">已確認</span></div>
+              <div class="next-visit">
+                <div class="visit-top"><span class="visit-time">09:30</span><span class="visit-status">準時</span></div>
+                <div class="person-row"><div class="person-avatar">林</div><div><strong>林秀琴・居家照顧</strong><span>王怡文 照服員</span></div></div>
+                <div class="visit-detail"><div><span>服務內容</span><strong>陪同用藥、早餐</strong></div><div><span>預計時間</span><strong>09:30 – 11:00</strong></div></div>
+              </div>
+            </section>
+
+            <section class="card side-card">
+              <div class="section-head"><div><h3>需要我處理</h3><p>只留下真正需要注意的事</p></div><span class="tag amber">2 件</span></div>
+              <div class="attention-list">
+                <div class="attention-item"><i class="attention-bullet coral"></i><div><strong>陳明德・血壓紀錄待確認</strong><span>08:10 · 照服員 陳怡君</span></div></div>
+                <div class="attention-item"><i class="attention-bullet"></i><div><strong>林秀琴・家屬留言待回覆</strong><span>昨天 20:42 · 「今天有睡好嗎？」</span></div></div>
+              </div>
+            </section>
+
+            <section class="card side-card network-card">
+              <div class="section-head"><div><h3>照護網絡</h3><p>點選一位長輩，查看完整脈絡</p></div><span class="tag lavender">4 位</span></div>
+              <div class="network-list" id="network-list"></div>
+            </section>
+          </aside>
+        </div>
+
+        <div class="prototype-note"><strong>Prototype mode</strong><span>這是 M1 視覺與互動原型；所有資料皆為 mock，不會傳送通知、不會撥打電話，也不會寫入真實個資。</span></div>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" id="mobile-nav" aria-label="手機導覽">
+      <button class="active" data-view="overview"><span class="glyph">⌂</span><span>總覽</span></button>
+      <button data-view="people"><span class="glyph">◉</span><span>個案</span></button>
+      <button data-view="schedule"><span class="glyph">▦</span><span>班表</span></button>
+      <button data-view="family"><span class="glyph">♡</span><span>協作</span></button>
+    </nav>
+
+    <div class="modal-backdrop" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <section class="modal">
+        <h2 id="modal-title">SOS 流程預覽</h2>
+        <p>這個按鈕目前只展示未來的安全流程，不會撥打電話或聯絡任何人。</p>
+        <div class="modal-warning"><strong>先確認：</strong><span>若是現實中的緊急情況，請直接撥打 119，並依現場安全指引處理。</span></div>
+        <div class="modal-actions"><button class="secondary-button" id="close-modal">返回工作台</button><button class="primary-button" id="preview-next">查看下一步</button></div>
+      </section>
+    </div>
+
+    <script>
+      const clients = [
+        { id: 'lin', name: '林秀琴', relation: '女兒・林怡君', state: '今日已服務 2 次', initials: '林', tone: 'peach', selected: true },
+        { id: 'chen', name: '陳明德', relation: '兒子・陳志豪', state: '有 1 件待確認', initials: '陳', tone: 'blue' },
+        { id: 'huang', name: '黃蔡美', relation: '女兒・黃郁雯', state: '今天 11:00 服務', initials: '黃', tone: 'lavender' },
+        { id: 'wu', name: '吳國華', relation: '太太・吳秀蘭', state: '今日已完成', initials: '吳', tone: 'green' }
+      ];
+
+      const timelines = {
+        lin: [
+          { time: '08:42', type: 'vital', tone: '', title: '早晨量測已完成', tag: '量測', copy: '血壓 128 / 76 · 體溫 36.5°C · 狀態平穩', action: '查看量測' },
+          { time: '08:10', type: 'service', tone: '', title: '照服員已到達', tag: '服務', copy: '陳怡君完成打卡，開始今日陪伴服務', action: '查看紀錄' },
+          { time: '07:55', type: 'family', tone: 'lavender', title: '家屬留下新訊息', tag: '家屬', copy: '林怡君：媽媽昨晚睡得比較好，麻煩今天幫我留意早餐。', action: '回覆' },
+          { time: '昨天', type: 'service', tone: 'amber', title: '用藥確認已記錄', tag: '照護', copy: '早餐前藥物由林秀琴本人確認服用', action: '查看紀錄' }
+        ],
+        chen: [
+          { time: '08:10', type: 'vital', tone: 'amber', title: '血壓紀錄待確認', tag: '需留意', copy: '照服員陳怡君記錄 152 / 88，尚未完成主管確認', action: '待處理' },
+          { time: '07:45', type: 'service', tone: '', title: '照服員已到達', tag: '服務', copy: '陳怡君完成打卡，開始晨間照護', action: '查看紀錄' },
+          { time: '昨天', type: 'family', tone: 'lavender', title: '家屬已讀照護摘要', tag: '家屬', copy: '陳志豪已查看昨日服務與量測紀錄', action: '查看互動' }
+        ],
+        huang: [
+          { time: '07:30', type: 'family', tone: 'lavender', title: '家屬更新照護備註', tag: '家屬', copy: '今天上午需要協助整理回診資料。', action: '查看備註' },
+          { time: '昨天', type: 'service', tone: '', title: '昨日服務已完成', tag: '服務', copy: '陪同散步 20 分鐘，情緒穩定', action: '查看紀錄' }
+        ],
+        wu: [
+          { time: '08:00', type: 'service', tone: '', title: '早晨服務已完成', tag: '服務', copy: '完成盥洗、早餐與環境整理', action: '查看紀錄' },
+          { time: '昨天', type: 'vital', tone: '', title: '昨日量測已歸檔', tag: '量測', copy: '血壓與體溫在個人平日範圍', action: '查看量測' }
+        ]
+      };
+
+      const roleCopy = {
+        manager: { eyebrow: '週三・09 月 24 日', title: '早安，Sean。<br />今天一起把照護接好。', copy: '目前 4 位長輩都有安排，只有 2 件事需要你看一眼。先從需要處理的開始。' },
+        caregiver: { eyebrow: '週三・我的今日班表', title: '早安，怡文。<br />下一站是林秀琴家。', copy: '你的下一個服務在 38 分鐘後開始，先確認今天要完成的兩件事。' },
+        family: { eyebrow: '週三・林秀琴的近況', title: '早安，怡君。<br />媽媽今天狀態平穩。', copy: '最新一筆量測與服務紀錄已更新；有一則留言需要你回覆。' }
+      };
+
+      let selectedClient = 'lin';
+      let currentFilter = 'all';
+
+      const timeline = document.getElementById('timeline');
+      const network = document.getElementById('network-list');
+      const subtitle = document.getElementById('timeline-subtitle');
+
+      function renderNetwork() {
+        network.innerHTML = clients.map(client => `
+          <button class="network-person ${client.id === selectedClient ? 'selected' : ''}" data-client="${client.id}">
+            <span class="person-row"><span class="person-avatar ${client.tone}">${client.initials}</span><span><strong>${client.name}</strong><span>${client.state}</span></span></span>
+            <span class="person-check">${client.id === selectedClient ? '●' : '○'}</span>
+          </button>`).join('');
+        network.querySelectorAll('[data-client]').forEach(button => button.addEventListener('click', () => {
+          selectedClient = button.dataset.client;
+          renderNetwork();
+          renderTimeline();
+        }));
+      }
+
+      function renderTimeline() {
+        const client = clients.find(item => item.id === selectedClient);
+        const items = timelines[selectedClient].filter(item => currentFilter === 'all' || item.type === currentFilter);
+        subtitle.textContent = `${client.name}・今天的每一個照顧，都在這裡接起來`;
+        timeline.innerHTML = items.length ? items.map((item, index) => `
+          <article class="timeline-item">
+            <time class="timeline-time">${item.time}</time>
+            <div class="timeline-line"><span class="timeline-icon ${item.tone}" aria-hidden="true"></span></div>
+            <div class="timeline-body"><div class="timeline-title">${item.title}<span class="tag ${item.tone === 'amber' ? 'amber' : item.tone === 'lavender' ? 'lavender' : ''}">${item.tag}</span></div><p class="timeline-copy">${item.copy}</p></div>
+            <button class="timeline-action" data-action="${item.action}">${item.action}</button>
+          </article>`).join('') : '<p class="timeline-copy" style="padding: 24px 0;">這個篩選目前沒有紀錄。</p>';
+        timeline.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', () => {
+          button.textContent = '已標記';
+          button.classList.add('done');
+        }));
+      }
+
+      document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => {
+        document.querySelectorAll('.filter').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        currentFilter = button.dataset.filter;
+        renderTimeline();
+      }));
+
+      function switchView(view) {
+        document.querySelectorAll('[data-view]').forEach(item => item.classList.toggle('active', item.dataset.view === view));
+        if (view !== 'overview') {
+          document.getElementById('timeline-heading').textContent = view === 'people' ? '個案脈絡' : view === 'schedule' ? '班表脈絡' : '家屬協作脈絡';
+        } else {
+          document.getElementById('timeline-heading').textContent = '照護脈絡';
+        }
+      }
+      document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
+
+      document.getElementById('role-select').addEventListener('change', event => {
+        const copy = roleCopy[event.target.value];
+        document.getElementById('hero-eyebrow').textContent = copy.eyebrow;
+        document.getElementById('hero-title').innerHTML = copy.title;
+        document.getElementById('hero-copy').textContent = copy.copy;
+      });
+
+      const modal = document.getElementById('sos-modal');
+      const openModal = () => modal.classList.add('open');
+      document.getElementById('sos-button').addEventListener('click', openModal);
+      document.getElementById('sos-button-main').addEventListener('click', openModal);
+      document.getElementById('close-modal').addEventListener('click', () => modal.classList.remove('open'));
+      document.getElementById('preview-next').addEventListener('click', event => { event.currentTarget.textContent = '下一步已預覽'; });
+      modal.addEventListener('click', event => { if (event.target === modal) modal.classList.remove('open'); });
+      document.getElementById('new-note').addEventListener('click', event => { event.currentTarget.textContent = '已開啟快速記錄'; });
+
+      renderNetwork();
+      renderTimeline();
+    </script>
+  </body>
+</html>

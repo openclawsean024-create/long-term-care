@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## UI prototype / 2026-09-24
+
+- Added `PRD/UI-SPEC.md` with competitor benchmark, M1 information architecture, visual system, and interaction boundaries.
+- Added standalone `web/ui-prototype.html` for the care-manager dashboard concept.
+- Prototype uses mock data only; no React implementation, real notifications, phone calls, credentials, or personal data.
+
 ## Governance baseline / 2026-09-24
 
 - Added project-level `AGENTS.md`, `SOP.md`, `STATUS.md`, and bounded M1 `GOAL.md`.
