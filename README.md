@@ -16,6 +16,10 @@ npm test         # 跑測試
 
 ```
 long-term-care/
+├── AGENTS.md              ← 專案工程規範
+├── SOP.md                 ← 規格對齊與驗證 SOP
+├── STATUS.md              ← Sprint / 三向對齊證據
+├── GOAL.md                ← M1 bounded objective
 ├── PRD/SPEC.md            ← 完整規格書
 ├── PRD/CHANGELOG.md       ← 變更日誌
 ├── .github/workflows/     ← GHA 4-job CI
