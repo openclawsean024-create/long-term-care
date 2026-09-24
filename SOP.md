@@ -5,7 +5,8 @@
 - ✅ `PRD/SPEC.md` v3.0.2 已在 repo。
 - ✅ GitHub `main`、本地 checkout 與 Notion canonical Project row 目前都指向 `02db3c96272563772d3ed1c3c70c735420e5625a`。
 - ⚠️ Vercel URL 已記錄為 `https://long-term-care.vercel.app`，但本次無 `VERCEL_TOKEN`，尚未完成 production SHA / HTTP 驗證。
-- ⚠️ 目前是 scaffold；FR-001～FR-007 尚未實作，不能宣稱「已上線」或 DoD 完成。
+- ✅ M1 mock-only React 工作台已實作 FR-001～FR-007 的前端可演示流程；未接真實個資、通知、電話或雲端服務。
+- ⚠️ 尚未完成 production DoD：沒有真實 auth/RBAC、加密同步、外部通知、E2E、CI 對齊或 Vercel release。
 
 ## M1 — 可驗證產品骨架
 
@@ -22,12 +23,13 @@
 
 ```bash
 cd web
+npm run lint
 npm run typecheck
 npm test
 npm run build
 ```
 
-目前 `npm run lint`、integration 與 E2E 尚未配置；不得把缺少命令當成通過。CI workflow 在現況仍以 repo root 執行 `npm ci`，與 `web/package.json` 不一致，列為下一個 integrator blocker。
+目前 integration 與 E2E 尚未配置；不得把缺少命令當成通過。CI workflow 在現況仍以 repo root 執行 `npm ci`，與 `web/package.json` 不一致，列為下一個 integrator blocker。
 
 ## 故意不做
 
@@ -38,7 +40,5 @@ npm run build
 
 ## 已知 blocker
 
-- `web/package.json` 宣稱 React 18.3，而 SPEC／Notion 描述 React 19；須在技術棧決策後統一。
-- `web/` 沒有 lockfile，且目前沒有 lint、測試檔、integration 或 E2E 設定。
+- `web/` 的 React 19 與 SPEC 對齊；仍沒有 integration 或 E2E 設定。
 - `.github/workflows/ci.yml` 在 repo root 執行 npm 命令，但 package.json 位於 `web/`；修正 CI 前不得宣稱 GHA 四 jobs 全綠。
-

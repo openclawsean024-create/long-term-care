@@ -1,272 +1,958 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-locale="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#111b2a" />
+    <meta name="theme-color" content="#0e1a24" />
+    <meta name="description" content="Careboard prototype for long-term care operations. International, locale-aware, mock-data only." />
     <title>Careboard — 長照安心管家 M1 Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;display=swap" />
     <style>
-      :root {
-        --ink: #111b2a; --ink-2: #1e2b3b; --muted: #718091; --muted-2: #a7b2bd;
-        --canvas: #f3f5f4; --surface: #ffffff; --line: #dfe6e3;
-        --mint: #b9e8d4; --mint-strong: #3da47c; --blue: #4e76e8; --blue-pale: #e8edff;
-        --amber: #c27832; --amber-pale: #fff0dc; --coral: #db625b; --coral-pale: #ffe7e2;
-        --lilac: #876ad2; --lilac-pale: #eeeaff; --shadow: 0 22px 60px rgba(17, 27, 42, .08);
-        --font: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      :root{
+        /* Editorial, non-pastel palette */
+        --ink:#0e1a24;
+        --ink-2:#14222f;
+        --ink-3:#1c2a38;
+        --ink-4:#243749;
+        --line-on-dark:#25364a;
+        --line-on-light:#d9d2c4;
+        --paper:#f4eee2;
+        --paper-2:#ebe4d4;
+        --paper-3:#ffffff;
+        --accent:#c5853a;
+        --accent-strong:#d6913a;
+        --accent-soft:#f1d9a8;
+        --healthy:#2f7d5d;
+        --healthy-soft:#d2e8d8;
+        --attention:#b07535;
+        --attention-soft:#f0e0c5;
+        --action:#b13e36;
+        --action-soft:#f0d4cf;
+        --emergency:#7a1f1a;
+        --emergency-soft:#e9c8c5;
+        --service:#385f8e;
+        --service-soft:#d3dde9;
+        --family:#6a4f97;
+        --family-soft:#e3dcef;
+        --muted-dark:#8ea0af;
+        --muted-light:#6a6759;
+        --shadow-card:0 24px 50px rgba(14,26,36,.22);
+        --shadow-hover:0 14px 30px rgba(14,26,36,.18);
+        --shadow-quiet:0 8px 22px rgba(14,26,36,.10);
+        --font-sans:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","Helvetica Neue",system-ui,"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+        --font-serif:"Source Serif 4",ui-serif,"New York","Iowan Old Style","Songti TC","Noto Serif TC",Georgia,serif;
       }
-      * { box-sizing: border-box; }
-      html { background: var(--canvas); }
-      body { margin: 0; color: var(--ink); background: var(--canvas); font-family: var(--font); font-size: 14px; line-height: 1.55; }
-      button, select { font: inherit; }
-      button { cursor: pointer; }
-      button:focus-visible, select:focus-visible { outline: 3px solid rgba(78, 118, 232, .3); outline-offset: 2px; }
+      *,*::before,*::after{box-sizing:border-box}
+      html{background:var(--ink)}
+      body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--font-sans);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+      button,select,input{font:inherit;color:inherit}
+      button{cursor:pointer;border:0;background:transparent}
+      a{color:inherit}
+      .skip-link{position:absolute;left:-9999px;top:0;z-index:100;padding:10px 14px;background:var(--accent-strong);color:var(--ink);font-weight:800;text-decoration:none}
+      .skip-link:focus{left:12px;top:12px}
+      :focus-visible{outline:3px solid rgba(213,145,58,.6);outline-offset:2px;border-radius:5px}
+      button:focus-visible,a:focus-visible{outline-offset:3px}
+      .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-      .product-shell { display: grid; grid-template-columns: 254px minmax(0, 1fr); min-height: 100vh; }
-      .rail { display: flex; flex-direction: column; padding: 25px 18px 19px; background: var(--ink); color: white; }
-      .brand { display: flex; align-items: center; gap: 11px; padding: 0 8px 28px; }
-      .brand-mark { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 12px; color: var(--ink); background: var(--mint); font-weight: 950; letter-spacing: -.12em; }
-      .brand strong { display: block; font-size: 15px; letter-spacing: .02em; }
-      .brand small { display: block; margin-top: 1px; color: #92a5b0; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-      .org-switch { display: flex; align-items: center; gap: 9px; margin: 0 3px 28px; padding: 11px 12px; border: 1px solid #314153; border-radius: 12px; color: #c2d0d8; background: #1b2a3c; text-align: left; }
-      .org-switch .org-mark { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; color: var(--ink); background: #f4c079; font-size: 11px; font-weight: 900; }
-      .org-switch span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .org-switch strong { display: block; color: white; font-size: 11px; }
-      .org-switch small { display: block; margin-top: 1px; color: #8697a3; font-size: 10px; }
-      .rail-label { padding: 0 11px 8px; color: #718392; font-size: 10px; font-weight: 850; letter-spacing: .16em; text-transform: uppercase; }
-      .nav { display: grid; gap: 4px; }
-      .nav button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 12px; border: 0; border-radius: 10px; color: #9eafb9; background: transparent; text-align: left; transition: .18s ease; }
-      .nav button:hover { color: white; background: #1c2b3d; }
-      .nav button.active { color: var(--ink); background: var(--mint); font-weight: 850; }
-      .glyph { display: grid; place-items: center; width: 20px; color: currentColor; font-size: 17px; }
-      .rail-divider { height: 1px; margin: 25px 10px 22px; background: #29394b; }
-      .rail-status { margin-top: auto; padding: 14px; border: 1px solid #2e4351; border-radius: 14px; background: #162536; }
-      .rail-status .status-top { display: flex; justify-content: space-between; color: #a7bdc4; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-      .status-dot { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(185,232,212,.12); }
-      .rail-status strong { display: block; margin: 9px 0 5px; color: white; font-size: 13px; }
-      .rail-status p { margin: 0; color: #8fa3ad; font-size: 11px; }
+      .product-shell{display:grid;grid-template-columns:262px minmax(0,1fr);min-height:100vh}
 
-      .main { min-width: 0; padding: 24px clamp(18px, 4vw, 58px) 36px; }
-      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
-      .crumbs { color: var(--muted); font-size: 12px; }
-      .crumbs strong { color: var(--ink); }
-      .crumbs span { padding: 0 8px; color: #bac5c9; }
-      .command-bar { display: flex; align-items: center; gap: 8px; }
-      .command-bar > * { min-height: 37px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
-      .sync-state { display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; color: var(--muted); font-size: 11px; font-weight: 750; }
-      .sync-state i { width: 6px; height: 6px; border-radius: 50%; background: var(--mint-strong); }
-      .role-select, .locale-select { padding: 0 10px; color: var(--ink); font-size: 11px; font-weight: 800; }
-      .locale-select { width: 74px; }
-      .icon-button { display: grid; place-items: center; width: 37px; padding: 0; color: var(--muted); font-size: 16px; }
-      .avatar { display: grid; place-items: center; width: 35px; height: 35px; border: 0; border-radius: 50%; color: #fff; background: var(--blue); font-size: 11px; font-weight: 850; }
+      /* Sidebar rail — deep ink editorial */
+      .rail{display:flex;flex-direction:column;padding:26px 18px 20px;background:var(--ink);color:white;position:sticky;top:0;height:100vh}
+      .brand{display:flex;align-items:center;gap:11px;padding:0 8px 26px}
+      .brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--accent-strong);color:var(--ink);font-family:var(--font-serif);font-weight:600;font-size:18px;letter-spacing:-.05em}
+      .brand strong{display:block;font-size:14px;font-weight:800;letter-spacing:.02em}
+      .brand small{display:block;margin-top:1px;color:var(--muted-dark);font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:800}
+      .org-switch{display:flex;align-items:center;gap:10px;margin:0 3px 26px;padding:11px 12px;border:1px solid var(--line-on-dark);border-radius:11px;color:#d0dae3;background:var(--ink-2);text-align:left;width:100%}
+      .org-switch:hover{background:var(--ink-3)}
+      .org-switch .org-mark{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--accent-strong);color:var(--ink);font-weight:900;font-size:11px}
+      .org-switch .org-meta{display:block;min-width:0;overflow:hidden}
+      .org-switch strong{display:block;color:white;font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .org-switch small{display:block;margin-top:1px;color:var(--muted-dark);font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .org-switch .chev{margin-left:auto;color:var(--muted-dark);font-size:11px}
+      .rail-label{padding:0 11px 8px;color:var(--muted-dark);font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}
+      .nav{display:grid;gap:3px}
+      .nav button{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:9px;color:#a8b8c4;background:transparent;text-align:left;transition:.18s ease}
+      .nav button:hover{color:white;background:var(--ink-3)}
+      .nav button.active{color:var(--ink);background:var(--paper);font-weight:800}
+      .glyph{display:grid;place-items:center;width:18px;color:currentColor;font-size:14px;font-weight:700}
+      .rail-divider{height:1px;margin:24px 10px 20px;background:var(--line-on-dark)}
+      .rail-status{margin-top:auto;padding:14px;border:1px solid var(--line-on-dark);border-radius:13px;background:var(--ink-2)}
+      .rail-status .status-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted-dark);font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+      .rail-status .env-dot{display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:var(--accent-strong);box-shadow:0 0 0 4px rgba(213,145,58,.14)}
+      .rail-status strong{display:block;margin:9px 0 5px;color:white;font-size:13px;font-weight:800}
+      .rail-status p{margin:0;color:var(--muted-dark);font-size:10.5px;line-height:1.5}
 
-      .hero { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; min-height: 260px; margin-bottom: 18px; padding: 30px 32px; overflow: hidden; border-radius: 22px; color: white; background: var(--ink); box-shadow: 0 25px 55px rgba(17, 27, 42, .16); }
-      .hero-copy { position: relative; z-index: 1; }
-      .kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--mint); font-size: 10px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
-      .kicker::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
-      h1, h2, h3, p { margin-top: 0; }
-      h1 { max-width: 680px; margin: 16px 0 10px; font-size: clamp(29px, 4vw, 49px); line-height: 1.08; letter-spacing: -.065em; }
-      h1 span { color: var(--mint); }
-      .hero-copy > p { max-width: 530px; margin-bottom: 22px; color: #a9b8c3; font-size: 13px; }
-      .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-      .primary-button, .secondary-button { min-height: 39px; padding: 0 14px; border: 1px solid transparent; border-radius: 9px; font-size: 12px; font-weight: 850; }
-      .primary-button { color: var(--ink); background: var(--mint); }
-      .primary-button:hover { background: #d4f5e5; }
-      .secondary-button { color: white; border-color: #405263; background: transparent; }
-      .secondary-button:hover { border-color: #6a7c88; background: #1b2a3c; }
-      .hero-pulse { position: relative; display: flex; align-items: center; justify-content: center; min-height: 200px; border-left: 1px solid #304153; }
-      .pulse-orbit { position: relative; display: grid; place-items: center; width: 165px; height: 165px; border: 1px solid #385367; border-radius: 50%; background: radial-gradient(circle, rgba(185,232,212,.18) 0 32%, transparent 33% 55%, rgba(185,232,212,.08) 56% 56.5%, transparent 57%); }
-      .pulse-orbit::before, .pulse-orbit::after { content: ""; position: absolute; border-radius: 50%; background: var(--mint); }
-      .pulse-orbit::before { top: 17px; right: 24px; width: 6px; height: 6px; box-shadow: 0 0 0 5px rgba(185,232,212,.14); }
-      .pulse-orbit::after { bottom: 27px; left: 23px; width: 4px; height: 4px; opacity: .7; }
-      .pulse-center { text-align: center; }
-      .pulse-center small { display: block; color: #a1b6bd; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-      .pulse-center strong { display: block; margin: 1px 0; color: white; font-size: 43px; line-height: 1; letter-spacing: -.08em; }
-      .pulse-center span { color: var(--mint); font-size: 11px; font-weight: 800; }
+      /* Main canvas */
+      .main{min-width:0;padding:24px clamp(18px,4vw,56px) 36px}
+      .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+      .crumbs{display:flex;align-items:center;gap:8px;color:var(--muted-light);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:800}
+      .crumbs strong{color:var(--ink);font-weight:800}
+      .crumbs .sep{color:#b9af9d}
+      .crumbs .tz-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;color:var(--muted-light);background:var(--paper-2);font-size:10px;letter-spacing:.08em;text-transform:none;font-weight:700}
+      .crumbs .tz-pill i{width:5px;height:5px;border-radius:50%;background:var(--accent-strong)}
+      .command-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .command-bar > *{min-height:36px;border:1px solid var(--line-on-light);border-radius:9px;background:var(--paper-3)}
+      .sync-state{display:inline-flex;align-items:center;gap:8px;padding:0 11px;color:var(--muted-light);font-size:11px;font-weight:700}
+      .sync-state i{width:7px;height:7px;border-radius:50%;background:var(--healthy);box-shadow:0 0 0 4px var(--healthy-soft)}
+      .sync-state .meta{display:flex;flex-direction:column;line-height:1.2}
+      .sync-state .meta strong{color:var(--ink);font-weight:800;font-size:11px}
+      .sync-state .meta small{color:var(--muted-light);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+      .role-select,.locale-select{padding:0 26px 0 10px;color:var(--ink);font-size:11px;font-weight:800;background:var(--paper-3);-webkit-appearance:none;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted-light) 50%),linear-gradient(135deg,var(--muted-light) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+      .locale-select{min-width:78px}
+      .role-select{min-width:160px}
+      .icon-button{display:grid;place-items:center;width:36px;padding:0;color:var(--muted-light);font-size:15px;font-weight:700}
+      .icon-button:hover{color:var(--ink);background:var(--paper-2)}
+      .avatar{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--ink-2);color:white;font-size:11px;font-weight:800;letter-spacing:.02em}
+      .avatar-frame{padding:2px;border:1px solid var(--line-on-light);border-radius:50%;background:var(--paper-3)}
 
-      .focus-queue { display: grid; grid-template-columns: 1.05fr 1fr 1fr auto; align-items: stretch; margin-bottom: 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 10px 25px rgba(17,27,42,.04); }
-      .queue-intro, .queue-item { display: flex; align-items: center; gap: 12px; padding: 15px 17px; border-right: 1px solid var(--line); }
-      .queue-intro { background: #f9fbfa; }
-      .queue-intro .index { color: var(--blue); font-size: 11px; font-weight: 900; }
-      .queue-intro span:not(.index) { display: block; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
-      .queue-intro strong { display: block; margin-top: 2px; font-size: 13px; }
-      .queue-item { min-width: 0; gap: 10px; }
-      .queue-item:last-of-type { border-right: 0; }
-      .queue-icon { display: grid; place-items: center; flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px; color: var(--amber); background: var(--amber-pale); font-size: 14px; }
-      .queue-icon.coral { color: var(--coral); background: var(--coral-pale); }
-      .queue-item strong, .queue-item span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .queue-item strong { font-size: 12px; }
-      .queue-item span { margin-top: 1px; color: var(--muted); font-size: 10px; }
-      .queue-link { padding: 0 16px; border: 0; color: var(--blue); background: transparent; font-size: 11px; font-weight: 850; white-space: nowrap; }
+      /* Hero — editorial */
+      .hero{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px;min-height:268px;margin-bottom:18px;padding:30px 32px;overflow:hidden;border-radius:20px;color:var(--paper);background:linear-gradient(140deg,var(--ink) 0%,var(--ink-2) 60%,var(--ink-3) 100%);box-shadow:var(--shadow-card);position:relative}
+      .hero::after{content:"";position:absolute;right:-30px;top:-30px;width:220px;height:220px;border:1px solid rgba(213,145,58,.18);border-radius:50%;pointer-events:none}
+      .hero::before{content:"";position:absolute;right:60px;bottom:-80px;width:160px;height:160px;border:1px solid rgba(255,255,255,.06);border-radius:50%;pointer-events:none}
+      .hero-copy{position:relative;z-index:1}
+      .kicker{display:inline-flex;align-items:center;gap:10px;padding:5px 9px;border:1px solid rgba(213,145,58,.35);border-radius:6px;color:var(--accent-strong);font-family:var(--font-serif);font-style:italic;font-size:11px;letter-spacing:.06em;text-transform:none;background:rgba(213,145,58,.06)}
+      .kicker::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent-strong)}
+      h1,h2,h3,p{margin-top:0}
+      h1{max-width:680px;margin:14px 0 12px;font-family:var(--font-serif);font-weight:600;font-size:clamp(30px,4vw,52px);line-height:1.06;letter-spacing:-.04em}
+      h1 span{color:var(--accent-strong)}
+      .hero-copy > p{max-width:520px;margin-bottom:24px;color:#aab6c2;font-size:13px;line-height:1.6}
+      .hero-actions{display:flex;flex-wrap:wrap;gap:8px}
+      .primary-button,.secondary-button,.ghost-button{min-height:38px;padding:0 14px;border:1px solid transparent;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px}
+      .primary-button{color:var(--ink);background:var(--accent-strong)}
+      .primary-button:hover{background:#e2a148}
+      .secondary-button{color:var(--paper);border-color:rgba(255,255,255,.18);background:transparent}
+      .secondary-button:hover{background:var(--ink-3);border-color:rgba(255,255,255,.32)}
+      .ghost-button{color:var(--paper);border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+      .ghost-button:hover{background:rgba(255,255,255,.08)}
+      .hero-pulse{position:relative;display:flex;align-items:center;justify-content:center;min-height:200px;border-left:1px solid rgba(255,255,255,.06)}
+      .pulse-orbit{position:relative;display:grid;place-items:center;width:170px;height:170px;border:1px solid rgba(213,145,58,.28);border-radius:50%;background:radial-gradient(circle,rgba(213,145,58,.16) 0 32%,transparent 33% 55%,rgba(213,145,58,.06) 56% 56.5%,transparent 57%)}
+      .pulse-orbit::before,.pulse-orbit::after{content:"";position:absolute;border-radius:50%;background:var(--accent-strong)}
+      .pulse-orbit::before{top:18px;right:24px;width:6px;height:6px;box-shadow:0 0 0 5px rgba(213,145,58,.18)}
+      .pulse-orbit::after{bottom:30px;left:22px;width:4px;height:4px;opacity:.75}
+      .pulse-center{text-align:center}
+      .pulse-center small{display:block;color:#aab6c2;font-family:var(--font-serif);font-style:italic;font-size:11px;letter-spacing:.04em}
+      .pulse-center strong{display:block;margin:3px 0;font-family:var(--font-serif);font-weight:600;color:var(--paper);font-size:46px;line-height:1;letter-spacing:-.06em}
+      .pulse-center .pulse-meta{display:block;margin-top:4px;color:var(--accent-strong);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+      .pulse-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.06)}
+      .pulse-stat{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.02)}
+      .pulse-stat small{color:#8d99a5;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+      .pulse-stat strong{color:var(--paper);font-family:var(--font-serif);font-weight:600;font-size:18px;letter-spacing:-.02em}
 
-      .board-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(295px, .78fr); gap: 18px; align-items: start; }
-      .panel { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: var(--shadow); }
-      .chronology { min-height: 620px; padding: 23px 24px 14px; }
-      .panel-head { display: flex; align-items: start; justify-content: space-between; gap: 14px; margin-bottom: 17px; }
-      .panel-head h2 { margin-bottom: 3px; font-size: 19px; letter-spacing: -.04em; }
-      .panel-head h3 { margin-bottom: 3px; font-size: 15px; letter-spacing: -.025em; }
-      .panel-head p { margin: 0; color: var(--muted); font-size: 11px; }
-      .live { display: inline-flex; align-items: center; gap: 7px; color: var(--mint-strong); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
-      .live i { width: 6px; height: 6px; border-radius: 50%; background: var(--mint-strong); }
-      .filters { display: flex; gap: 6px; padding-bottom: 14px; border-bottom: 1px solid var(--line); overflow-x: auto; }
-      .filter { padding: 7px 10px; border: 1px solid transparent; border-radius: 7px; color: var(--muted); background: #f4f6f5; font-size: 11px; font-weight: 850; white-space: nowrap; }
-      .filter.active { color: var(--ink); border-color: #b8d9ca; background: var(--mint); }
-      .timeline { display: grid; padding-top: 4px; }
-      .timeline-item { display: grid; grid-template-columns: 48px 19px minmax(0, 1fr) auto; gap: 12px; min-height: 104px; }
-      .timeline-time { padding-top: 17px; color: var(--muted); font-size: 11px; font-weight: 850; text-align: right; }
-      .timeline-line { position: relative; display: flex; justify-content: center; }
-      .timeline-line::before { content: ""; position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
-      .timeline-item:last-child .timeline-line::before { bottom: 50%; }
-      .timeline-icon { position: relative; z-index: 1; display: grid; place-items: center; width: 19px; height: 19px; margin-top: 16px; border: 4px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px #a7b9f1; }
-      .timeline-icon.amber { background: var(--amber); box-shadow: 0 0 0 1px #edc592; }
-      .timeline-icon.lavender { background: var(--lilac); box-shadow: 0 0 0 1px #cbbcf1; }
-      .timeline-body { padding: 14px 0 16px; border-bottom: 1px solid #edf1ef; }
-      .timeline-item:last-child .timeline-body { border-bottom: 0; }
-      .timeline-title { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-bottom: 4px; font-size: 13px; font-weight: 850; }
-      .timeline-copy { margin: 0; color: var(--muted); font-size: 12px; }
-      .tag { display: inline-flex; align-items: center; min-height: 21px; padding: 0 6px; border-radius: 5px; color: #276f58; background: #def5e9; font-size: 9px; font-weight: 900; }
-      .tag.amber { color: #8d571d; background: var(--amber-pale); }
-      .tag.lavender { color: #60489e; background: var(--lilac-pale); }
-      .timeline-action { align-self: center; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; font-weight: 850; white-space: nowrap; }
-      .timeline-action:hover, .timeline-action.done { border-color: #aecfbe; color: #276f58; background: #effaf4; }
+      /* Focus queue — status taxonomy */
+      .focus-queue{display:grid;grid-template-columns:1.05fr 1fr 1fr auto;align-items:stretch;margin-bottom:18px;overflow:hidden;border:1px solid var(--line-on-light);border-radius:15px;background:var(--paper-3);box-shadow:var(--shadow-quiet)}
+      .queue-intro,.queue-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-right:1px solid var(--line-on-light)}
+      .queue-intro{background:var(--paper-2)}
+      .queue-intro .index{font-family:var(--font-serif);font-style:italic;font-weight:600;color:var(--accent);font-size:13px}
+      .queue-intro .intro-copy{display:block;min-width:0}
+      .queue-intro .intro-copy span{display:block;color:var(--muted-light);font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}
+      .queue-intro .intro-copy strong{display:block;margin-top:3px;font-family:var(--font-serif);font-weight:600;font-size:14px;letter-spacing:-.02em}
+      .queue-item{min-width:0;gap:11px}
+      .queue-item:last-of-type{border-right:0}
+      .queue-icon{display:grid;place-items:center;flex:0 0 auto;width:30px;height:30px;border-radius:9px;color:var(--attention);background:var(--attention-soft);font-size:13px;font-weight:700}
+      .queue-icon.healthy{color:var(--healthy);background:var(--healthy-soft)}
+      .queue-icon.attention{color:var(--attention);background:var(--attention-soft)}
+      .queue-icon.action{color:var(--action);background:var(--action-soft)}
+      .queue-icon.emergency{color:var(--emergency);background:var(--emergency-soft)}
+      .queue-body{min-width:0;flex:1 1 auto}
+      .queue-body strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:800}
+      .queue-body span{display:block;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted-light);font-size:10px}
+      .queue-link{padding:0 18px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+      .queue-link:hover{color:var(--ink)}
+      .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 18px;padding:10px 14px;border:1px dashed var(--line-on-light);border-radius:11px;background:var(--paper-2);color:var(--muted-light);font-size:10.5px}
+      .legend strong{color:var(--ink);font-weight:800}
+      .legend .dot{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;vertical-align:middle}
+      .legend .dot.healthy{background:var(--healthy)}
+      .legend .dot.attention{background:var(--attention)}
+      .legend .dot.action{background:var(--action)}
+      .legend .dot.emergency{background:var(--emergency)}
 
-      .dock { display: grid; gap: 15px; }
-      .dock-card { padding: 19px; }
-      .dock-card > p { margin-bottom: 14px; color: var(--muted); font-size: 11px; }
-      .resident-card { position: relative; overflow: hidden; padding: 18px; border-radius: 15px; color: white; background: linear-gradient(135deg, #25394b, #142331); }
-      .resident-card::after { content: ""; position: absolute; right: -20px; bottom: -40px; width: 120px; height: 120px; border: 1px solid rgba(185,232,212,.26); border-radius: 50%; }
-      .resident-card .resident-top { position: relative; z-index: 1; display: flex; align-items: start; justify-content: space-between; gap: 10px; }
-      .resident-card .portrait { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 14px; color: var(--ink); background: var(--mint); font-size: 16px; font-weight: 950; }
-      .resident-card h3 { margin: 2px 0 2px; color: white; font-size: 17px; }
-      .resident-card p { margin: 0; color: #afc0c8; font-size: 10px; }
-      .resident-card .state { padding: 5px 7px; border-radius: 6px; color: var(--mint); background: rgba(185,232,212,.1); font-size: 9px; font-weight: 900; }
-      .resident-card .resident-meta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 22px; padding-top: 12px; border-top: 1px solid #385063; }
-      .resident-card .resident-meta span { display: block; color: #91a6b0; font-size: 9px; }
-      .resident-card .resident-meta strong { display: block; margin-top: 2px; color: white; font-size: 11px; }
-      .next-slot { padding: 14px; border: 1px solid #c8ded5; border-radius: 12px; background: #f1faf5; }
-      .slot-top { display: flex; align-items: baseline; justify-content: space-between; gap: 9px; margin-bottom: 10px; }
-      .slot-time { color: #256b59; font-size: 23px; font-weight: 900; letter-spacing: -.07em; }
-      .slot-top span:last-child { color: #3d8d70; font-size: 10px; font-weight: 900; }
-      .person-row { display: flex; align-items: center; gap: 9px; }
-      .person-avatar { display: grid; place-items: center; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 10px; color: #5c7b8c; background: #dbe9ef; font-size: 11px; font-weight: 900; }
-      .person-avatar.peach { color: #83583e; background: #f1ddca; }
-      .person-avatar.lavender { color: #6750a3; background: #e8e0fb; }
-      .person-avatar.green { color: #3a8067; background: #d7f0e2; }
-      .person-row strong { display: block; font-size: 12px; }
-      .person-row span { display: block; overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
-      .slot-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #d7ebe1; }
-      .slot-detail span { display: block; color: var(--muted); font-size: 9px; }
-      .slot-detail strong { display: block; margin-top: 2px; font-size: 10px; }
-      .attention-list { display: grid; gap: 4px; }
-      .attention-item { display: flex; align-items: start; gap: 9px; padding: 10px 0; border-bottom: 1px solid #edf1ef; }
-      .attention-item:last-child { border-bottom: 0; }
-      .attention-bullet { flex: 0 0 auto; width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-pale); }
-      .attention-bullet.coral { background: var(--coral); box-shadow: 0 0 0 4px var(--coral-pale); }
-      .attention-item strong { display: block; font-size: 11px; }
-      .attention-item span { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
-      .network-list { display: grid; gap: 3px; }
-      .network-person { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px; border: 0; border-radius: 9px; background: transparent; text-align: left; }
-      .network-person:hover, .network-person.selected { background: #eff8f3; }
-      .person-check { color: var(--mint-strong); font-size: 12px; font-weight: 900; }
-      .prototype-note { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 10px 12px; border: 1px dashed #bacbc5; border-radius: 9px; color: var(--muted); background: rgba(255,255,255,.5); font-size: 10px; }
-      .prototype-note strong { color: #276f58; }
-      .mobile-nav { display: none; }
+      /* Board layout */
+      .board-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(305px,.82fr);gap:18px;align-items:start}
+      .panel{border:1px solid var(--line-on-light);border-radius:17px;background:var(--paper-3);box-shadow:var(--shadow-quiet)}
+      .chronology{min-height:620px;padding:22px 24px 14px;position:relative}
+      .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+      .panel-head h2{margin-bottom:4px;font-family:var(--font-serif);font-weight:600;font-size:21px;letter-spacing:-.025em}
+      .panel-head h3{margin-bottom:4px;font-family:var(--font-serif);font-weight:600;font-size:16px;letter-spacing:-.02em}
+      .panel-head p{margin:0;color:var(--muted-light);font-size:11px}
+      .live{display:inline-flex;align-items:center;gap:7px;color:var(--healthy);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+      .live i{width:6px;height:6px;border-radius:50%;background:var(--healthy);box-shadow:0 0 0 3px var(--healthy-soft)}
+      .filters{display:flex;gap:6px;padding-bottom:14px;border-bottom:1px solid var(--line-on-light);overflow-x:auto;scrollbar-width:none}
+      .filters::-webkit-scrollbar{display:none}
+      .filter{padding:7px 11px;border:1px solid transparent;border-radius:7px;color:var(--muted-light);background:transparent;font-size:11px;font-weight:800;white-space:nowrap}
+      .filter:hover{color:var(--ink)}
+      .filter.active{color:var(--ink);border-color:var(--accent);background:var(--accent-soft)}
+      .filter .count{margin-left:6px;padding:2px 6px;border-radius:4px;color:var(--muted-light);background:var(--paper-2);font-size:9.5px;font-weight:800}
+      .filter.active .count{color:var(--ink);background:var(--paper-3)}
+      .timeline{display:grid;padding-top:6px}
+      .timeline-item{display:grid;grid-template-columns:60px 22px minmax(0,1fr) auto;gap:12px;min-height:112px}
+      .timeline-time{padding-top:16px;color:var(--muted-light);font-size:11px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+      .timeline-time small{display:block;margin-top:1px;color:var(--muted-light);font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+      .timeline-line{position:relative;display:flex;justify-content:center}
+      .timeline-line::before{content:"";position:absolute;top:0;bottom:0;width:1px;background:var(--line-on-light)}
+      .timeline-item:last-child .timeline-line::before{bottom:50%}
+      .timeline-icon{position:relative;z-index:1;display:grid;place-items:center;width:22px;height:22px;margin-top:18px;border:4px solid var(--paper-3);border-radius:50%;background:var(--service);box-shadow:0 0 0 1px var(--service-soft);font-size:9px;color:white;font-weight:800}
+      .timeline-icon.healthy{background:var(--healthy);box-shadow:0 0 0 1px var(--healthy-soft)}
+      .timeline-icon.attention{background:var(--attention);box-shadow:0 0 0 1px var(--attention-soft)}
+      .timeline-icon.action{background:var(--action);box-shadow:0 0 0 1px var(--action-soft)}
+      .timeline-icon.emergency{background:var(--emergency);box-shadow:0 0 0 1px var(--emergency-soft)}
+      .timeline-icon.family{background:var(--family);box-shadow:0 0 0 1px var(--family-soft)}
+      .timeline-body{padding:14px 0 16px;border-bottom:1px solid var(--line-on-light)}
+      .timeline-item:last-child .timeline-body{border-bottom:0}
+      .timeline-title{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:4px;font-size:13px;font-weight:800}
+      .timeline-copy{margin:0;color:var(--muted-light);font-size:12px;line-height:1.55}
+      .timeline-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:7px;color:var(--muted-light);font-size:10px;font-weight:700}
+      .timeline-meta .meta-row{display:inline-flex;align-items:center;gap:5px}
+      .timeline-meta .avatar-chip{display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--ink-2);color:white;font-size:8px;font-weight:800;letter-spacing:0}
+      .timeline-meta .source-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;color:var(--muted-light);background:var(--paper-2);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+      .timeline-meta .source-tag.verified{color:var(--healthy);background:var(--healthy-soft)}
+      .timeline-meta .source-tag.pending{color:var(--attention);background:var(--attention-soft)}
+      .tag{display:inline-flex;align-items:center;min-height:21px;padding:0 7px;border-radius:5px;color:var(--healthy);background:var(--healthy-soft);font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+      .tag.attention{color:var(--attention);background:var(--attention-soft)}
+      .tag.action{color:var(--action);background:var(--action-soft)}
+      .tag.emergency{color:var(--emergency);background:var(--emergency-soft)}
+      .tag.service{color:var(--service);background:var(--service-soft)}
+      .tag.family{color:var(--family);background:var(--family-soft)}
+      .timeline-action{align-self:center;padding:8px 10px;border:1px solid var(--line-on-light);border-radius:7px;color:var(--muted-light);background:transparent;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+      .timeline-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+      .timeline-action.done{border-color:var(--healthy);color:var(--healthy);background:var(--healthy-soft)}
 
-      .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: none; place-items: center; padding: 20px; background: rgba(17,27,42,.58); }
-      .modal-backdrop.open { display: grid; }
-      .modal { width: min(440px, 100%); padding: 25px; border-radius: 19px; background: white; box-shadow: 0 25px 70px rgba(17,27,42,.3); }
-      .modal h2 { margin-bottom: 7px; font-size: 21px; letter-spacing: -.04em; }
-      .modal p { color: var(--muted); font-size: 12px; }
-      .modal-warning { display: flex; gap: 10px; margin: 16px 0; padding: 13px; border-radius: 11px; color: #8d571d; background: var(--amber-pale); font-size: 11px; }
-      .modal-actions { display: flex; justify-content: end; gap: 8px; }
-      .modal .secondary-button { color: var(--ink); border-color: var(--line); }
-      .modal .secondary-button:hover { background: #f5f7f6; }
-      .modal .primary-button { color: white; background: var(--blue); }
+      /* Dock */
+      .dock{display:grid;gap:14px}
+      .dock-card{padding:18px}
+      .dock-card > p{margin-bottom:14px;color:var(--muted-light);font-size:11px}
+      .resident-card{position:relative;overflow:hidden;padding:18px;border-radius:13px;color:var(--paper);background:linear-gradient(140deg,var(--ink) 0%,var(--ink-2) 65%,var(--ink-3) 100%);box-shadow:var(--shadow-quiet)}
+      .resident-card::after{content:"";position:absolute;right:-30px;bottom:-50px;width:140px;height:140px;border:1px solid rgba(213,145,58,.18);border-radius:50%;pointer-events:none}
+      .resident-card .resident-top{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+      .person-row{display:flex;align-items:center;gap:10px}
+      .person-avatar{display:grid;place-items:center;flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--paper-2);color:var(--ink);font-size:11px;font-weight:800}
+      .person-avatar.amber{color:#835a26;background:var(--accent-soft)}
+      .person-avatar.lavender{color:var(--family);background:var(--family-soft)}
+      .person-avatar.green{color:var(--healthy);background:var(--healthy-soft)}
+      .person-avatar.blue{color:var(--service);background:var(--service-soft)}
+      .person-avatar.gray{color:var(--muted-light);background:var(--paper-2)}
+      .resident-card .person-row strong{display:block;color:white;font-family:var(--font-serif);font-weight:600;font-size:17px;letter-spacing:-.02em}
+      .resident-card .person-row small{display:block;margin-top:2px;color:#a8b8c4;font-size:10px;letter-spacing:.04em}
+      .state-pill{padding:5px 8px;border-radius:6px;color:var(--accent-strong);background:rgba(213,145,58,.12);font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(213,145,58,.28)}
+      .state-pill.healthy{color:var(--healthy-soft);background:rgba(47,125,93,.18);border-color:rgba(47,125,93,.4)}
+      .state-pill.attention{color:var(--accent-strong);background:rgba(213,145,58,.12);border-color:rgba(213,145,58,.35)}
+      .state-pill.action{color:#e9a59f;background:rgba(177,62,54,.18);border-color:rgba(177,62,54,.4)}
+      .state-pill.emergency{color:#e9c0bc;background:rgba(122,31,26,.3);border-color:rgba(122,31,26,.5)}
+      .resident-meta{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+      .resident-meta .field{display:block}
+      .resident-meta .field span{display:block;color:#a8b8c4;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
+      .resident-meta .field strong{display:block;margin-top:4px;color:var(--paper);font-size:12px;font-weight:700}
+      .resident-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+      .resident-strip .strip-cell{display:flex;flex-direction:column;gap:2px}
+      .resident-strip .strip-cell span{color:#a8b8c4;font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:800}
+      .resident-strip .strip-cell strong{color:var(--paper);font-family:var(--font-serif);font-weight:600;font-size:18px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 
-      @media (max-width: 1080px) {
-        .product-shell { grid-template-columns: 78px minmax(0, 1fr); }
-        .rail { align-items: center; padding-inline: 12px; }
-        .brand { padding-inline: 0; }
-        .brand > div:not(.brand-mark), .org-switch > span, .org-switch > .org-mark + span, .rail-label, .nav button span:not(.glyph), .rail-divider, .rail-status { display: none; }
-        .org-switch { width: 34px; height: 34px; justify-content: center; padding: 0; }
-        .org-switch .org-mark { width: 25px; }
-        .nav { width: 100%; }
-        .nav button { justify-content: center; padding-inline: 0; }
-        .hero { grid-template-columns: minmax(0, 1fr) 230px; }
-        .focus-queue { grid-template-columns: 1fr 1fr; }
-        .queue-intro { grid-column: span 2; border-right: 0; border-bottom: 1px solid var(--line); }
+      .next-slot{padding:14px;border:1px solid var(--accent-soft);border-radius:12px;background:var(--accent-soft)}
+      .next-slot.urgent{border-color:var(--action);background:var(--action-soft)}
+      .slot-top{display:flex;align-items:baseline;justify-content:space-between;gap:9px;margin-bottom:10px}
+      .slot-time{color:var(--ink);font-family:var(--font-serif);font-weight:600;font-size:24px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+      .slot-top .slot-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+      .slot-top .slot-meta strong{color:var(--ink);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+      .slot-top .slot-meta small{color:var(--muted-light);font-size:10px;font-weight:700}
+      .slot-detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(197,133,58,.18)}
+      .slot-detail .field span{display:block;color:var(--muted-light);font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
+      .slot-detail .field strong{display:block;margin-top:3px;color:var(--ink);font-size:11px;font-weight:700}
+
+      .attention-list{display:grid;gap:2px}
+      .attention-item{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-on-light)}
+      .attention-item:last-child{border-bottom:0}
+      .attention-bullet{flex:0 0 auto;width:9px;height:9px;margin-top:6px;border-radius:50%;background:var(--attention);box-shadow:0 0 0 3px var(--attention-soft)}
+      .attention-bullet.action{background:var(--action);box-shadow:0 0 0 3px var(--action-soft)}
+      .attention-bullet.emergency{background:var(--emergency);box-shadow:0 0 0 3px var(--emergency-soft)}
+      .attention-bullet.healthy{background:var(--healthy);box-shadow:0 0 0 3px var(--healthy-soft)}
+      .attention-body{min-width:0}
+      .attention-body strong{display:block;font-size:12px;font-weight:800}
+      .attention-body span{display:block;margin-top:2px;color:var(--muted-light);font-size:10px}
+
+      .network-list{display:grid;gap:3px}
+      .network-person{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border-radius:9px;background:transparent;text-align:left;color:var(--ink)}
+      .network-person:hover{background:var(--paper-2)}
+      .network-person.selected{background:var(--paper-2);outline:1px solid var(--accent-soft)}
+      .network-person .check{color:var(--accent);font-size:12px;font-weight:900}
+      .network-person .network-meta{display:flex;align-items:center;gap:8px;min-width:0}
+      .network-person .network-meta .avatar{width:28px;height:28px;font-size:10px}
+      .network-person .network-meta strong{display:block;font-size:12px;font-weight:800}
+      .network-person .network-meta small{display:block;color:var(--muted-light);font-size:10px;margin-top:1px}
+
+      .prototype-note{display:flex;align-items:flex-start;gap:10px;margin-top:18px;padding:11px 14px;border:1px dashed var(--line-on-light);border-radius:10px;background:var(--paper-2);color:var(--muted-light);font-size:11px;line-height:1.55}
+      .prototype-note strong{color:var(--ink);font-weight:800;font-family:var(--font-serif);font-style:italic;font-weight:600}
+      .mobile-nav{display:none}
+
+      .modal-backdrop{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:20px;background:rgba(14,26,36,.62);backdrop-filter:blur(4px)}
+      .modal-backdrop.open{display:grid}
+      .modal{width:min(460px,100%);border-radius:18px;background:var(--paper-3);box-shadow:0 30px 80px rgba(14,26,36,.32);overflow:hidden}
+      .modal-head{padding:20px 22px 0}
+      .modal-head h2{margin-bottom:6px;font-family:var(--font-serif);font-weight:600;font-size:22px;letter-spacing:-.03em}
+      .modal-head p{margin:0;color:var(--muted-light);font-size:12px}
+      .modal-warning{display:flex;gap:12px;margin:18px 22px;padding:14px;border-radius:11px;color:#5b3416;background:var(--attention-soft);font-size:12px;line-height:1.5;border-left:3px solid var(--attention)}
+      .modal-warning strong{color:var(--ink);font-weight:800;display:block;margin-bottom:2px}
+      .modal-actions{display:flex;justify-content:flex-end;gap:8px;padding:0 22px 22px;background:var(--paper-3)}
+      .modal .secondary-button{color:var(--ink);border-color:var(--line-on-light);background:transparent}
+      .modal .secondary-button:hover{background:var(--paper-2)}
+      .modal .primary-button{color:var(--ink);background:var(--accent-strong)}
+
+      @media (max-width:1180px){
+        .pulse-strip{grid-template-columns:repeat(2,1fr)}
       }
-      @media (max-width: 780px) {
-        body { padding-bottom: 72px; }
-        .product-shell { display: block; }
-        .rail { display: none; }
-        .main { padding: 17px 14px 25px; }
-        .topbar { margin-bottom: 18px; }
-        .crumbs { font-size: 11px; }
-        .sync-state, .icon-button { display: none; }
-        .role-select { max-width: 112px; }
-        .locale-select { width: 68px; }
-        .hero { display: block; min-height: auto; padding: 24px 21px; border-radius: 18px; }
-        .hero-pulse { min-height: 145px; margin-top: 17px; border-top: 1px solid #304153; border-left: 0; }
-        .pulse-orbit { width: 125px; height: 125px; }
-        .pulse-center strong { font-size: 34px; }
-        .focus-queue { display: block; }
-        .queue-intro, .queue-item { border-right: 0; border-bottom: 1px solid var(--line); }
-        .queue-item:last-of-type { border-bottom: 0; }
-        .board-layout { grid-template-columns: 1fr; }
-        .chronology { min-height: 0; padding: 19px 15px 10px; border-radius: 16px; }
-        .panel-head { display: block; }
-        .live { margin-top: 9px; }
-        .timeline-item { grid-template-columns: 39px 17px minmax(0,1fr); gap: 8px; min-height: 113px; }
-        .timeline-action { grid-column: 3; justify-self: start; align-self: start; margin-top: -5px; }
-        .mobile-nav { position: fixed; right: 11px; bottom: 11px; left: 11px; z-index: 5; display: grid; grid-template-columns: repeat(4,1fr); gap: 3px; padding: 6px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.94); box-shadow: 0 15px 34px rgba(17,27,42,.16); backdrop-filter: blur(14px); }
-        .mobile-nav button { display: grid; gap: 2px; place-items: center; padding: 5px 2px; border: 0; border-radius: 9px; color: var(--muted); background: transparent; font-size: 9px; }
-        .mobile-nav button.active { color: var(--ink); background: var(--mint); font-weight: 850; }
-        .mobile-nav .glyph { font-size: 16px; }
+      @media (max-width:1080px){
+        .product-shell{grid-template-columns:78px minmax(0,1fr)}
+        .rail{align-items:center;padding-inline:12px}
+        .brand{padding-inline:0;justify-content:center}
+        .brand > div:not(.brand-mark),.org-switch .org-meta,.org-switch .chev,.rail-label,.nav button span:not(.glyph),.rail-divider,.rail-status{display:none}
+        .org-switch{width:36px;height:36px;justify-content:center;padding:0;margin-bottom:20px}
+        .org-switch .org-mark{width:26px}
+        .nav{width:100%}
+        .nav button{justify-content:center;padding-inline:0}
+        .hero{grid-template-columns:minmax(0,1fr) 240px;padding:26px 26px}
+        .focus-queue{grid-template-columns:1fr 1fr}
+        .queue-intro{grid-column:span 2;border-right:0;border-bottom:1px solid var(--line-on-light)}
+      }
+      @media (max-width:780px){
+        body{padding-bottom:74px}
+        .product-shell{display:block}
+        .rail{display:none}
+        .main{padding:16px 14px 24px}
+        .topbar{margin-bottom:16px}
+        .crumbs .tz-pill{display:none}
+        .sync-state,.icon-button{display:none}
+        .role-select{min-width:140px;max-width:170px}
+        .locale-select{min-width:68px}
+        .hero{display:block;min-height:auto;padding:24px 22px;border-radius:18px}
+        .hero-pulse{min-height:170px;margin-top:18px;border-top:1px solid rgba(255,255,255,.06);border-left:0;padding-top:18px}
+        .pulse-orbit{width:140px;height:140px}
+        .pulse-center strong{font-size:38px}
+        .pulse-strip{grid-template-columns:repeat(2,1fr)}
+        .focus-queue{display:block}
+        .queue-intro,.queue-item{border-right:0;border-bottom:1px solid var(--line-on-light)}
+        .queue-item:last-of-type{border-bottom:0}
+        .legend{font-size:10px}
+        .board-layout{grid-template-columns:1fr}
+        .chronology{min-height:0;padding:18px 16px 8px;border-radius:16px}
+        .panel-head{display:block}
+        .live{margin-top:8px}
+        .timeline-item{grid-template-columns:46px 20px minmax(0,1fr);gap:9px;min-height:108px}
+        .timeline-action{grid-column:3;justify-self:start;align-self:start;margin-top:-2px}
+        .dock{gap:12px}
+        .mobile-nav{position:fixed;right:11px;bottom:11px;left:11px;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:7px;border:1px solid var(--line-on-light);border-radius:16px;background:rgba(244,238,226,.95);box-shadow:0 16px 36px rgba(14,26,36,.18);backdrop-filter:blur(14px)}
+        .mobile-nav button{display:grid;gap:2px;place-items:center;padding:6px 2px;border-radius:9px;color:var(--muted-light);background:transparent;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+        .mobile-nav button.active{color:var(--ink);background:var(--accent-soft)}
+        .mobile-nav .glyph{font-size:14px}
+        .mobile-sos{position:fixed;right:11px;bottom:96px;z-index:6;display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:var(--accent-strong);color:var(--ink);font-size:13px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 14px 32px rgba(14,26,36,.28);border:1px solid rgba(255,255,255,.4)}
+      }
+      @media (prefers-reduced-motion:reduce){
+        *{transition:none!important;animation:none!important}
       }
     </style>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="product-shell">
       <aside class="rail" aria-label="Primary navigation">
-        <div class="brand"><div class="brand-mark" aria-hidden="true">照</div><div><strong>長照安心管家</strong><small>careboard / M1</small></div></div>
-        <button class="org-switch" type="button"><span class="org-mark">C</span><span><strong>Careline Taipei</strong><small>Local pilot workspace</small></span><b>⌄</b></button>
-        <div class="rail-label">Workspace</div>
-        <nav class="nav" id="desktop-nav"><button class="active" data-view="overview"><span class="glyph">⌂</span><span>Overview</span></button><button data-view="people"><span class="glyph">◉</span><span>People</span></button><button data-view="schedule"><span class="glyph">▦</span><span>Schedule</span></button><button data-view="journal"><span class="glyph">≡</span><span>Journal</span></button><button data-view="family"><span class="glyph">♡</span><span>Family loop</span></button></nav>
-        <div class="rail-divider"></div><div class="rail-label">System</div>
-        <nav class="nav"><button><span class="glyph">?</span><span>Help center</span></button><button><span class="glyph">⚙</span><span>Settings</span></button></nav>
-        <div class="rail-status"><div class="status-top"><span><i class="status-dot"></i>Environment</span><span>LOCAL</span></div><strong>Safe to explore</strong><p>Mock data only. Nothing leaves this workspace.</p></div>
+        <div class="brand"><div class="brand-mark" aria-hidden="true">C</div><div><strong id="brand-name">長照安心管家</strong><small>careboard / M1</small></div></div>
+        <button class="org-switch" type="button" aria-label="Switch workspace"><span class="org-mark">CL</span><span class="org-meta"><strong id="org-name">Careline Taipei</strong><small id="org-tag">Local pilot workspace</small></span><span class="chev" aria-hidden="true">⌄</span></button>
+        <div class="rail-label" id="rail-label-workspace">Workspace</div>
+        <nav class="nav" id="desktop-nav" aria-label="Workspace views"><button class="active" data-view="overview"><span class="glyph" aria-hidden="true">◐</span><span data-i18n="nav.overview">Overview</span></button><button data-view="people"><span class="glyph" aria-hidden="true">○</span><span data-i18n="nav.people">Residents</span></button><button data-view="schedule"><span class="glyph" aria-hidden="true">▤</span><span data-i18n="nav.schedule">Schedule</span></button><button data-view="journal"><span class="glyph" aria-hidden="true">≡</span><span data-i18n="nav.journal">Journal</span></button><button data-view="family"><span class="glyph" aria-hidden="true">♡</span><span data-i18n="nav.family">Family loop</span></button></nav>
+        <div class="rail-divider"></div>
+        <div class="rail-label" id="rail-label-system">System</div>
+        <nav class="nav" aria-label="System"><button><span class="glyph" aria-hidden="true">?</span><span data-i18n="system.help">Help center</span></button><button><span class="glyph" aria-hidden="true">⚙</span><span data-i18n="system.settings">Settings</span></button></nav>
+        <div class="rail-status"><div class="status-top"><span><i class="env-dot" aria-hidden="true"></i><span data-i18n="status.environment">Environment</span></span><span id="rail-env-badge">LOCAL</span></div><strong id="rail-env-title">Safe to explore</strong><p id="rail-env-copy">Mock data only. Nothing leaves this workspace.</p></div>
       </aside>
 
-      <main class="main">
-        <header class="topbar"><div class="crumbs"><strong>Careboard</strong><span>/</span>Overview</div><div class="command-bar"><span class="sync-state"><i></i>Updated 2 min ago</span><select class="locale-select" aria-label="Language"><option>繁中</option><option>EN</option></select><select class="role-select" id="role-select" aria-label="切換角色"><option value="manager">Manager view</option><option value="caregiver">Caregiver view</option><option value="family">Family view</option></select><button class="icon-button" aria-label="Notifications">♧</button><div class="avatar" aria-label="Sean Li">SL</div></div></header>
+      <main class="main" id="main-content" tabindex="-1">
+        <header class="topbar"><div class="crumbs"><strong id="crumb-workspace">Careboard</strong><span class="sep" aria-hidden="true">/</span><span id="crumb-view">Overview</span><span class="tz-pill" aria-label="Workspace timezone"><i aria-hidden="true"></i><span id="tz-label">Asia/Taipei</span></span></div><div class="command-bar"><span class="sync-state" role="status" aria-live="polite"><i aria-hidden="true"></i><span class="meta"><strong id="sync-headline">In sync</strong><small id="sync-time">2 min ago</small></span></span><select class="locale-select" id="locale-select" aria-label="Language"><option value="zh-Hant">繁中</option><option value="en">EN</option></select><select class="role-select" id="role-select" aria-label="Role view"><option value="manager" data-i18n="role.manager">Manager view</option><option value="caregiver" data-i18n="role.caregiver">Caregiver view</option><option value="family" data-i18n="role.family">Family view</option></select><button class="icon-button" type="button" aria-label="Notifications">♧</button><span class="avatar-frame" title="Sean Li"><span class="avatar" aria-label="Sean Li">SL</span></span></div></header>
 
-        <section class="hero"><div class="hero-copy"><span class="kicker" id="hero-eyebrow">WED · 24 SEP 2026 · ASIA/TAIPEI</span><h1 id="hero-title">Good morning, <span>Sean.</span><br />Your careboard is clear.</h1><p id="hero-copy">Four residents are covered today. Two items need a human look — start with the ones that change the next decision.</p><div class="hero-actions"><button class="secondary-button" id="new-note">＋ Quick note</button><button class="primary-button" id="sos-button-main">Preview SOS flow</button></div></div><div class="hero-pulse"><div class="pulse-orbit"><div class="pulse-center"><small>Today’s pulse</small><strong>78%</strong><span>care on track</span></div></div></div></section>
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <span class="kicker" id="hero-eyebrow">OVERVIEW · 24 SEP 2026 · ASIA/TAIPEI</span>
+            <h1 id="hero-title">Good morning, <span>Sean.</span></h1>
+            <p id="hero-copy">Four residents are covered today. Two items need a human call — start with the one that changes the next decision.</p>
+            <div class="hero-actions"><button class="secondary-button" type="button" id="new-note">＋ <span data-i18n="heroActions.secondary">Quick note</span></button><button class="primary-button" type="button" id="sos-button-main"><span data-i18n="heroActions.cta">Preview SOS flow</span> →</button></div>
+          </div>
+          <div class="hero-pulse">
+            <div class="pulse-orbit" aria-hidden="true"><div class="pulse-center"><small data-i18n="pulse.today">Today</small><strong id="pulse-pct">78%</strong><span class="pulse-meta" data-i18n="pulse.ok">care on track</span></div></div>
+            <div class="pulse-strip" aria-label="Today's signals">
+              <div class="pulse-stat"><small data-i18n="pulse.visits">Visits</small><strong id="pulse-visits">5 / 8</strong></div>
+              <div class="pulse-stat"><small data-i18n="pulse.review">Reviews</small><strong id="pulse-review">1</strong></div>
+              <div class="pulse-stat"><small data-i18n="pulse.family">Family msgs</small><strong id="pulse-family">2</strong></div>
+              <div class="pulse-stat"><small data-i18n="pulse.signals">Signals</small><strong id="pulse-signals">+1</strong></div>
+            </div>
+          </div>
+        </section>
 
-        <section class="focus-queue" aria-label="Focus queue"><div class="queue-intro"><span class="index">01</span><div><span>Focus queue</span><strong>2 items need your attention</strong></div></div><div class="queue-item"><span class="queue-icon coral">↗</span><div><strong>陳明德 · review vital</strong><span>152 / 88 · 08:10 · 1 owner</span></div></div><div class="queue-item"><span class="queue-icon">↩</span><div><strong>林秀琴 · family reply</strong><span>Message from 林怡君 · yesterday</span></div></div><button class="queue-link" id="queue-link">Open queue →</button></section>
+        <section class="focus-queue" aria-label="Focus queue">
+          <div class="queue-intro"><span class="index" aria-hidden="true">01</span><div class="intro-copy"><span data-i18n="queue.intro">Focus queue</span><strong id="queue-headline">2 items need your attention</strong></div></div>
+          <div class="queue-item" id="queue-1"><span class="queue-icon action" aria-hidden="true">↗</span><div class="queue-body"><strong id="queue-1-title">陳明德 · review vital</strong><span id="queue-1-meta">152 / 88 · 08:10 · 1 owner</span></div></div>
+          <div class="queue-item" id="queue-2"><span class="queue-icon family" aria-hidden="true" style="background:var(--family-soft);color:var(--family)">↩</span><div class="queue-body"><strong id="queue-2-title">林秀琴 · family reply</strong><span id="queue-2-meta">Message from 林怡君 · yesterday</span></div></div>
+          <button class="queue-link" type="button" id="queue-link"><span data-i18n="queue.link">Open queue →</span></button>
+        </section>
 
-        <div class="board-layout"><section class="panel chronology" aria-labelledby="timeline-heading"><div class="panel-head"><div><h2 id="timeline-heading">照護脈絡</h2><p id="timeline-subtitle">林秀琴 · one connected story of care</p></div><div class="live"><i></i>Live context</div></div><div class="filters" role="tablist" aria-label="Timeline filters"><button class="filter active" data-filter="all">All <span>6</span></button><button class="filter" data-filter="service">Service <span>2</span></button><button class="filter" data-filter="vital">Vitals <span>1</span></button><button class="filter" data-filter="family">Family <span>2</span></button></div><div class="timeline" id="timeline" aria-live="polite"></div></section>
-          <aside class="dock" aria-label="Context dock"><section class="panel dock-card"><div class="resident-card"><div class="resident-top"><div class="person-row"><div class="portrait">林</div><div><h3 id="resident-name">林秀琴</h3><p>78 · Home care plan</p></div></div><span class="state">Stable</span></div><div class="resident-meta"><div><span>Family loop</span><strong>2 members</strong></div><div><span>Next review</span><strong>Today · 16:00</strong></div></div></div></section><section class="panel dock-card"><div class="panel-head"><div><h3>Next service</h3><p>38 minutes from now</p></div><span class="tag">Confirmed</span></div><div class="next-slot"><div class="slot-top"><span class="slot-time">09:30</span><span>ON TIME</span></div><div class="person-row"><div class="person-avatar peach">林</div><div><strong>林秀琴 · home care</strong><span>王怡文 · caregiver</span></div></div><div class="slot-detail"><div><span>Focus</span><strong>Medication + breakfast</strong></div><div><span>Window</span><strong>09:30 — 11:00</strong></div></div></div></section><section class="panel dock-card"><div class="panel-head"><div><h3>Needs a look</h3><p>Only actionable context</p></div><span class="tag amber">2 items</span></div><div class="attention-list"><div class="attention-item"><i class="attention-bullet coral"></i><div><strong>陳明德 · vital needs review</strong><span>08:10 · owner: 陳怡君</span></div></div><div class="attention-item"><i class="attention-bullet"></i><div><strong>林秀琴 · family reply</strong><span>Yesterday 20:42 · 1 open message</span></div></div></div></section><section class="panel dock-card"><div class="panel-head"><div><h3>Care network</h3><p>Switch resident context</p></div><span class="tag lavender">4 people</span></div><div class="network-list" id="network-list"></div></section></aside></div>
+        <div class="legend" aria-label="Status legend"><strong data-i18n="legend.title">Status</strong><span><i class="dot healthy"></i><span data-i18n="status.healthy">Stable</span></span><span><i class="dot attention"></i><span data-i18n="status.attention">Attention</span></span><span><i class="dot action"></i><span data-i18n="status.action">Action required</span></span><span><i class="dot emergency"></i><span data-i18n="status.emergency">Emergency</span></span></div>
 
-        <div class="prototype-note"><strong>Prototype mode</strong><span>Mock data only · no notifications, calls, personal data, or clinical decisioning. This is a product direction for review before React implementation.</span></div>
+        <div class="board-layout">
+          <section class="panel chronology" aria-labelledby="timeline-heading">
+            <div class="panel-head"><div><h2 id="timeline-heading">照護脈絡</h2><p id="timeline-subtitle">林秀琴 · one connected story of care</p></div><div class="live"><i aria-hidden="true"></i><span id="timeline-live" data-i18n="chronology.live">Live context</span></div></div>
+            <div class="filters" role="tablist" aria-label="Timeline filters">
+              <button class="filter active" type="button" role="tab" data-filter="all"><span data-i18n="filters.all">All</span><span class="count" id="count-all">0</span></button>
+              <button class="filter" type="button" role="tab" data-filter="service"><span data-i18n="filters.service">Service</span><span class="count" id="count-service">0</span></button>
+              <button class="filter" type="button" role="tab" data-filter="vital"><span data-i18n="filters.vital">Vitals</span><span class="count" id="count-vital">0</span></button>
+              <button class="filter" type="button" role="tab" data-filter="family"><span data-i18n="filters.family">Family</span><span class="count" id="count-family">0</span></button>
+              <button class="filter" type="button" role="tab" data-filter="alert"><span data-i18n="filters.alert">Alerts</span><span class="count" id="count-alert">0</span></button>
+            </div>
+            <div class="timeline" id="timeline" aria-live="polite" aria-busy="false"></div>
+          </section>
+
+          <aside class="dock" aria-label="Context dock">
+            <section class="panel dock-card">
+              <div class="resident-card">
+                <div class="resident-top">
+                  <div class="person-row"><span class="person-avatar amber" id="resident-portrait">林</span><div><strong id="resident-name">林秀琴</strong><small id="resident-meta">78 · 居家照護 A 級</small></div></div>
+                  <span class="state-pill attention" id="resident-state">Stable</span>
+                </div>
+                <div class="resident-meta">
+                  <div class="field"><span data-i18n="dock.resident.family">Family loop</span><strong id="resident-family">2 members</strong></div>
+                  <div class="field"><span data-i18n="dock.resident.review">Next review</span><strong id="resident-review">Today · 16:00</strong></div>
+                </div>
+                <div class="resident-strip" id="resident-strip">
+                  <div class="strip-cell"><span data-i18n="dock.residentStrip.visits">Visits today</span><strong id="resident-visits">3</strong></div>
+                  <div class="strip-cell"><span data-i18n="dock.residentStrip.signals">Open signals</span><strong id="resident-signals">1</strong></div>
+                  <div class="strip-cell"><span data-i18n="dock.residentStrip.messages">Family msgs</span><strong id="resident-msgs">2</strong></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel dock-card">
+              <div class="panel-head"><div><h3 data-i18n="dock.next.title">Next service</h3><p id="dock-next-when">38 minutes from now</p></div><span class="tag" id="dock-next-state">Confirmed</span></div>
+              <div class="next-slot" id="dock-next-slot">
+                <div class="slot-top"><span class="slot-time" id="dock-next-time">09:30</span><span class="slot-meta"><strong id="dock-next-status">On time</strong><small id="dock-next-window">09:30 — 11:00</small></span></div>
+                <div class="person-row"><span class="person-avatar peach" id="dock-next-portrait">林</span><div><strong id="dock-next-resident">林秀琴 · home care</strong><small id="dock-next-caregiver">王怡文 · caregiver</small></div></div>
+                <div class="slot-detail">
+                  <div class="field"><span data-i18n="dock.next.focus">Focus</span><strong id="dock-next-focus">Medication + breakfast</strong></div>
+                  <div class="field"><span data-i18n="dock.next.window">Window</span><strong id="dock-next-window-2">09:30 — 11:00</strong></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel dock-card">
+              <div class="panel-head"><div><h3 data-i18n="dock.needs.title">Needs a look</h3><p data-i18n="dock.needs.copy">Only actionable context</p></div><span class="tag amber" id="dock-needs-count">2 items</span></div>
+              <div class="attention-list" id="attention-list"></div>
+            </section>
+
+            <section class="panel dock-card">
+              <div class="panel-head"><div><h3 data-i18n="dock.network.title">Care network</h3><p data-i18n="dock.network.copy">Switch resident context</p></div><span class="tag family" id="dock-network-count">4 people</span></div>
+              <div class="network-list" id="network-list"></div>
+            </section>
+          </aside>
+        </div>
+
+        <div class="prototype-note"><strong data-i18n="note.title">Prototype mode.</strong><span data-i18n="note.copy">Mock data only · no notifications, calls, personal data, or clinical decisioning. This is a design direction for review before React implementation.</span></div>
       </main>
     </div>
-    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation"><button class="active" data-view="overview"><span class="glyph">⌂</span><span>Overview</span></button><button data-view="people"><span class="glyph">◉</span><span>People</span></button><button data-view="schedule"><span class="glyph">▦</span><span>Schedule</span></button><button data-view="family"><span class="glyph">♡</span><span>Family</span></button></nav>
-    <div class="modal-backdrop" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><section class="modal"><h2 id="modal-title">SOS flow preview</h2><p>This prototype only shows the safety sequence. It will not call a number or contact a person.</p><div class="modal-warning"><strong>Real emergency:</strong><span>Call your local emergency service directly and follow on-site safety guidance.</span></div><div class="modal-actions"><button class="secondary-button" id="close-modal">Back to board</button><button class="primary-button" id="preview-next">Preview next step</button></div></section></div>
+
+    <button class="mobile-sos" type="button" id="sos-button-mobile" aria-label="Preview SOS flow">SOS</button>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation"><button class="active" data-view="overview"><span class="glyph" aria-hidden="true">◐</span><span data-i18n="mobile.overview">Overview</span></button><button data-view="people"><span class="glyph" aria-hidden="true">○</span><span data-i18n="mobile.people">Residents</span></button><button data-view="schedule"><span class="glyph" aria-hidden="true">▦</span><span data-i18n="mobile.schedule">Schedule</span></button><button data-view="family"><span class="glyph" aria-hidden="true">♡</span><span data-i18n="mobile.family">Family</span></button></nav>
+
+    <div class="modal-backdrop" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <section class="modal">
+        <div class="modal-head"><h2 id="modal-title">SOS flow preview</h2><p id="modal-copy">This prototype only shows the safety sequence. It will not call a number or contact a person.</p></div>
+        <div class="modal-warning"><div><strong id="modal-warning-title">Real emergency:</strong><span id="modal-warning-copy">Call your local emergency service directly and follow on-site safety guidance.</span></div></div>
+        <div class="modal-actions"><button class="secondary-button" type="button" id="close-modal"><span data-i18n="modal.back">Back to board</span></button><button class="primary-button" type="button" id="preview-next"><span data-i18n="modal.preview">Preview next step</span> →</button></div>
+      </section>
+    </div>
+
     <script>
-      const clients = [{ id: 'lin', name: '林秀琴', relation: '女兒・林怡君', state: 'Service on track', initials: '林', tone: 'peach' }, { id: 'chen', name: '陳明德', relation: '兒子・陳志豪', state: '1 item needs review', initials: '陳', tone: 'blue' }, { id: 'huang', name: '黃蔡美', relation: '女兒・黃郁雯', state: 'Next service 11:00', initials: '黃', tone: 'lavender' }, { id: 'wu', name: '吳國華', relation: '太太・吳秀蘭', state: 'All clear today', initials: '吳', tone: 'green' }];
-      const timelines = { lin: [{ time: '08:42', type: 'vital', tone: '', title: '早晨量測已完成', tag: 'Vitals', copy: '血壓 128 / 76 · 體溫 36.5°C · 狀態平穩', action: 'View vitals' }, { time: '08:10', type: 'service', tone: '', title: '照服員已到達', tag: 'Service', copy: '陳怡君完成打卡，開始今日陪伴服務', action: 'View note' }, { time: '07:55', type: 'family', tone: 'lavender', title: '家屬留下新訊息', tag: 'Family', copy: '林怡君：媽媽昨晚睡得比較好，麻煩今天幫我留意早餐。', action: 'Reply' }, { time: '昨天', type: 'service', tone: 'amber', title: '用藥確認已記錄', tag: 'Care', copy: '早餐前藥物由林秀琴本人確認服用', action: 'View note' }], chen: [{ time: '08:10', type: 'vital', tone: 'amber', title: '血壓紀錄待確認', tag: 'Attention', copy: '照服員陳怡君記錄 152 / 88，尚未完成主管確認', action: 'Review' }, { time: '07:45', type: 'service', tone: '', title: '照服員已到達', tag: 'Service', copy: '陳怡君完成打卡，開始晨間照護', action: 'View note' }, { time: '昨天', type: 'family', tone: 'lavender', title: '家屬已讀照護摘要', tag: 'Family', copy: '陳志豪已查看昨日服務與量測紀錄', action: 'View loop' }], huang: [{ time: '07:30', type: 'family', tone: 'lavender', title: '家屬更新照護備註', tag: 'Family', copy: '今天上午需要協助整理回診資料。', action: 'View note' }, { time: '昨天', type: 'service', tone: '', title: '昨日服務已完成', tag: 'Service', copy: '陪同散步 20 分鐘，情緒穩定', action: 'View note' }], wu: [{ time: '08:00', type: 'service', tone: '', title: '早晨服務已完成', tag: 'Service', copy: '完成盥洗、早餐與環境整理', action: 'View note' }, { time: '昨天', type: 'vital', tone: '', title: '昨日量測已歸檔', tag: 'Vitals', copy: '血壓與體溫在個人平日範圍', action: 'View vitals' }] };
-      const roleCopy = { manager: { eyebrow: 'WED · 24 SEP 2026 · ASIA/TAIPEI', title: 'Good morning, <span>Sean.</span><br />Your careboard is clear.', copy: 'Four residents are covered today. Two items need a human look — start with the ones that change the next decision.' }, caregiver: { eyebrow: 'WED · MY DAY · ASIA/TAIPEI', title: 'Good morning, <span>怡文.</span><br />Your next stop is ready.', copy: 'Your next service starts in 38 minutes. Here is what matters before you arrive.' }, family: { eyebrow: 'WED · 林秀琴 · ASIA/TAIPEI', title: 'Good morning, <span>怡君.</span><br />Your mother is on track.', copy: 'The latest care note and vital check are here. One family message is waiting for your reply.' } };
-      let selectedClient = 'lin'; let currentFilter = 'all';
-      const timeline = document.getElementById('timeline'); const network = document.getElementById('network-list'); const subtitle = document.getElementById('timeline-subtitle');
-      function renderNetwork() { network.innerHTML = clients.map(client => `<button class="network-person ${client.id === selectedClient ? 'selected' : ''}" data-client="${client.id}"><span class="person-row"><span class="person-avatar ${client.tone}">${client.initials}</span><span><strong>${client.name}</strong><span>${client.state}</span></span></span><span class="person-check">${client.id === selectedClient ? '●' : '○'}</span></button>`).join(''); network.querySelectorAll('[data-client]').forEach(button => button.addEventListener('click', () => { selectedClient = button.dataset.client; renderNetwork(); renderTimeline(); })); }
-      function renderTimeline() { const client = clients.find(item => item.id === selectedClient); const items = timelines[selectedClient].filter(item => currentFilter === 'all' || item.type === currentFilter); subtitle.textContent = `${client.name} · one connected story of care`; timeline.innerHTML = items.length ? items.map(item => `<article class="timeline-item"><time class="timeline-time">${item.time}</time><div class="timeline-line"><span class="timeline-icon ${item.tone}" aria-hidden="true"></span></div><div class="timeline-body"><div class="timeline-title">${item.title}<span class="tag ${item.tone === 'amber' ? 'amber' : item.tone === 'lavender' ? 'lavender' : ''}">${item.tag}</span></div><p class="timeline-copy">${item.copy}</p></div><button class="timeline-action" data-action="${item.action}">${item.action}</button></article>`).join('') : '<p class="timeline-copy" style="padding:24px 0;">No records in this view.</p>'; timeline.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', () => { button.textContent = 'Handled'; button.classList.add('done'); })); }
-      document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.filter').forEach(item => item.classList.remove('active')); button.classList.add('active'); currentFilter = button.dataset.filter; renderTimeline(); }));
-      function switchView(view) { document.querySelectorAll('[data-view]').forEach(item => item.classList.toggle('active', item.dataset.view === view)); document.getElementById('timeline-heading').textContent = view === 'people' ? '個案脈絡' : view === 'schedule' ? '班表脈絡' : view === 'family' ? '家屬協作脈絡' : '照護脈絡'; }
-      document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
-      document.getElementById('role-select').addEventListener('change', event => { const copy = roleCopy[event.target.value]; document.getElementById('hero-eyebrow').textContent = copy.eyebrow; document.getElementById('hero-title').innerHTML = copy.title; document.getElementById('hero-copy').textContent = copy.copy; });
-      const modal = document.getElementById('sos-modal'); const openModal = () => modal.classList.add('open');
-      document.getElementById('sos-button-main').addEventListener('click', openModal); document.getElementById('close-modal').addEventListener('click', () => modal.classList.remove('open')); document.getElementById('preview-next').addEventListener('click', event => { event.currentTarget.textContent = 'Next step previewed'; }); modal.addEventListener('click', event => { if (event.target === modal) modal.classList.remove('open'); }); document.getElementById('new-note').addEventListener('click', event => { event.currentTarget.textContent = 'Quick note ready'; }); document.getElementById('queue-link').addEventListener('click', event => { event.currentTarget.textContent = 'Queue opened'; });
-      renderNetwork(); renderTimeline();
+    /* ---------------------------------------------------------------------
+     * Mock-only data — names are fictional, no real PHI.
+     * Locale-neutral structure: every user-facing string lives in `i18n`
+     * and is rendered through `t()`. Dates / numbers / times flow through
+     * Intl.DateTimeFormat / Intl.NumberFormat using the workspace timezone.
+     * ------------------------------------------------------------------- */
+    const WORKSPACE_TZ = "Asia/Taipei";
+    const STATUS_TONES = { healthy: "healthy", attention: "attention", action: "action", emergency: "emergency" };
+
+    const i18n = {
+      "zh-Hant": {
+        locale: "zh-Hant", localeName: "繁體中文", hour12: false,
+        workspace: { name: "Careline Taipei", tagline: "居家照護示範工作區" },
+        tz: "Asia/Taipei", tzLabel: "亞洲/台北",
+        sync: { headline: "同步正常", meta: "2 分鐘前", state: "LIVE" },
+        status: { environment: "環境", healthy: "平穩", attention: "需關注", action: "需處理", emergency: "緊急" },
+        legend: { title: "狀態圖例" },
+        nav: { overview: "總覽", people: "個案", schedule: "班表", journal: "紀錄", family: "家屬協作" },
+        system: { help: "說明中心", settings: "設定" },
+        crumbs: { overview: "總覽", people: "個案", schedule: "班表", journal: "紀錄", family: "家屬協作" },
+        role: { manager: "管理者視角", caregiver: "照服員視角", family: "家屬視角", label: "切換角色" },
+        locale: { label: "語言" },
+        mobile: { overview: "總覽", people: "個案", schedule: "班表", family: "家屬" },
+        hero: {
+          kicker: "今日總覽",
+          manager: { eyebrow: "總覽 · 24 SEP 2026 · 亞洲/台北", greeting: "早安，<span>Sean。</span>", lead: "今天四位長輩照護已排定。其中兩項需要人工作判斷 — 從影響下一步的那件開始。" },
+          caregiver: { eyebrow: "我的班次 · 24 SEP 2026 · 亞洲/台北", greeting: "早安，<span>怡文。</span>", lead: "下一個服務 38 分鐘後開始。抵達前最重要的兩件事已整理。" },
+          family: { eyebrow: "秀琴 · 24 SEP 2026 · 亞洲/台北", greeting: "早安，<span>怡君。</span>", lead: "媽媽今天進度平穩。最新的照護紀錄與量測已彙整；一則家屬訊息待回覆。" }
+        },
+        heroActions: { cta: "預覽 SOS 流程", secondary: "快速紀錄" },
+        pulse: { today: "今日整體", ok: "照護進度正常", visits: "服務", review: "覆核", family: "家屬訊息", signals: "新訊號" },
+        queue: { intro: "焦點佇列", introSub: "需要你判斷的事項", items: "{{n}} 項需要處理", link: "開啟佇列" },
+        chronology: { title: "照護脈絡", subtitle: "{{name}} · 同一條照護紀錄", live: "即時同步" },
+        filters: { all: "全部", service: "服務", vital: "量測", family: "家屬", alert: "警示" },
+        empty: "此分類目前沒有紀錄。",
+        dock: {
+          resident: { family: "家屬協作", review: "下次覆核" },
+          residentStrip: { visits: "今日服務", signals: "待回覆訊號", messages: "家屬訊息" },
+          next: { title: "下一個服務", when: "{{n}} 分鐘後", confirmed: "已確認", focus: "重點", window: "時段", onTime: "準時", urgent: "即將開始" },
+          needs: { title: "需要檢視", copy: "只看需要動作的內容", count: "{{n}} 項" },
+          network: { title: "照護網絡", copy: "切換個案", count: "{{n}} 位" }
+        },
+        actions: {
+          "view-vitals": "查看量測", "view-note": "查看紀錄", "reply": "回覆訊息",
+          "review": "立即覆核", "view-loop": "查看迴圈", "handled": "已處理",
+          "open-summary": "查看摘要", "send-message": "傳訊息給團隊"
+        },
+        tags: { service: "服務", vital: "量測", family: "家屬", care: "照護", alert: "警示" },
+        sources: { "mobile-app": "行動 App", "family-app": "家屬 App", sensor: "IoT 感測" },
+        confidence: { verified: "已驗證", pending: "待覆核" },
+        nextSlot: { onTime: "準時", running: "進行中", confirmed: "已確認" },
+        syncMeta: { by: "{{role}} · {{name}}" },
+        pulseStrip: { visits: "服務", family: "家屬訊息", signals: "新訊號", review: "覆核" },
+        modal: {
+          title: "SOS 流程預覽",
+          copy: "本原型僅展示安全流程示意；不會實際撥號或聯絡任何人。",
+          warningTitle: "若為真實緊急情況：",
+          warningCopy: "請直接撥打當地緊急電話，並依照現場安全指引行動。",
+          back: "返回看版", preview: "預覽下一步", previewed: "已預覽下一步"
+        },
+        note: { title: "Prototype mode.", copy: "僅展示資料 · 不會送出通知、撥號、寫入個資或進行醫療判讀。本檔為 React 實作前的設計方向，僅供審閱。" }
+      },
+      "en": {
+        locale: "en", localeName: "English", hour12: true,
+        workspace: { name: "Careline Taipei", tagline: "Home care pilot workspace" },
+        tz: "Asia/Taipei", tzLabel: "Asia/Taipei",
+        sync: { headline: "In sync", meta: "2 minutes ago", state: "LIVE" },
+        status: { environment: "Environment", healthy: "Stable", attention: "Attention", action: "Action required", emergency: "Emergency" },
+        legend: { title: "Status legend" },
+        nav: { overview: "Overview", people: "Residents", schedule: "Schedule", journal: "Journal", family: "Family loop" },
+        system: { help: "Help center", settings: "Settings" },
+        crumbs: { overview: "Overview", people: "Residents", schedule: "Schedule", journal: "Journal", family: "Family loop" },
+        role: { manager: "Manager view", caregiver: "Caregiver view", family: "Family view", label: "Role view" },
+        locale: { label: "Language" },
+        mobile: { overview: "Overview", people: "Residents", schedule: "Schedule", family: "Family" },
+        hero: {
+          kicker: "Careboard brief",
+          manager: { eyebrow: "OVERVIEW · 24 SEP 2026 · ASIA/TAIPEI", greeting: "Good morning, <span>Sean.</span>", lead: "Four residents are covered today. Two items need a human call — start with the one that changes the next decision." },
+          caregiver: { eyebrow: "MY SHIFT · 24 SEP 2026 · ASIA/TAIPEI", greeting: "Good morning, <span>Yi-Wen.</span>", lead: "Your next visit starts in 38 minutes. Here is what matters before you arrive." },
+          family: { eyebrow: "HSIU-CHIN · 24 SEP 2026 · ASIA/TAIPEI", greeting: "Good morning, <span>Yi-Chun.</span>", lead: "Your mother is on track today. The latest care note and vitals are summarised; one family message is waiting for your reply." }
+        },
+        heroActions: { cta: "Preview SOS flow", secondary: "Quick note" },
+        pulse: { today: "Today", ok: "care on track", visits: "Visits", review: "Reviews", family: "Family msgs", signals: "Signals" },
+        queue: { intro: "Focus queue", introSub: "Things that need a human call", items: "{{n}} items need attention", link: "Open queue" },
+        chronology: { title: "Care chronology", subtitle: "{{name}} · one connected story of care", live: "Live context" },
+        filters: { all: "All", service: "Service", vital: "Vitals", family: "Family", alert: "Alerts" },
+        empty: "No records in this view.",
+        dock: {
+          resident: { family: "Family loop", review: "Next review" },
+          residentStrip: { visits: "Visits today", signals: "Open signals", messages: "Family msgs" },
+          next: { title: "Next service", when: "{{n}} minutes from now", confirmed: "Confirmed", focus: "Focus", window: "Window", onTime: "On time", urgent: "Starting soon" },
+          needs: { title: "Needs a look", copy: "Only actionable context", count: "{{n}} items" },
+          network: { title: "Care network", copy: "Switch resident context", count: "{{n}} people" }
+        },
+        actions: {
+          "view-vitals": "View vitals", "view-note": "View note", "reply": "Reply",
+          "review": "Review now", "view-loop": "View loop", "handled": "Handled",
+          "open-summary": "Open summary", "send-message": "Message team"
+        },
+        tags: { service: "Service", vital: "Vitals", family: "Family", care: "Care", alert: "Alert" },
+        sources: { "mobile-app": "Mobile App", "family-app": "Family App", sensor: "IoT" },
+        confidence: { verified: "Verified", pending: "Pending" },
+        nextSlot: { onTime: "On time", running: "Running", confirmed: "Confirmed" },
+        syncMeta: { by: "{{role}} · {{name}}" },
+        pulseStrip: { visits: "Visits", family: "Family msgs", signals: "Signals", review: "Reviews" },
+        modal: {
+          title: "SOS flow preview",
+          copy: "This prototype only shows the safety sequence. It will not call a number or contact a person.",
+          warningTitle: "In a real emergency:",
+          warningCopy: "Call your local emergency service directly and follow on-site safety guidance.",
+          back: "Back to board", preview: "Preview next step", previewed: "Next step previewed"
+        },
+        note: { title: "Prototype mode.", copy: "Mock data only · no notifications, calls, personal data, or clinical decisioning. A design direction for review before React implementation." }
+      }
+    };
+
+    const residents = [
+      {
+        id: "lin", initials: { "zh-Hant": "林", "en": "LX" }, portraitTone: "amber",
+        status: "attention",
+        names: { "zh-Hant": { full: "林秀琴", given: "秀琴", short: "秀琴" }, "en": { full: "Lin Hsiu-Chin", given: "Hsiu-Chin", short: "Hsiu-Chin" } },
+        age: 78,
+        carePlan: { "zh-Hant": "居家照護 A 級", "en": "Home care · tier A" },
+        timezone: "Asia/Taipei",
+        family: [{ initials: "YL", names: { "zh-Hant": "林怡君", "en": "Yi-Chun Lin" }, relation: { "zh-Hant": "女兒", "en": "Daughter" } }],
+        caregiver: { initials: "YW", names: { "zh-Hant": "王怡文", "en": "Yi-Wen Wang" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } },
+        next: { iso: "2026-09-24T09:30:00+08:00", durationMin: 90, status: "onTime",
+          focus: { "zh-Hant": "用藥協助 + 早餐陪伴", "en": "Medication + breakfast support" },
+          window: { "zh-Hant": "09:30 — 11:00", "en": "09:30 — 11:00" } },
+        nextReview: { "zh-Hant": "今日 16:00", "en": "Today · 16:00" },
+        queue: {
+          "zh-Hant": { title: "林秀琴 · family reply", meta: "訊息來自 林怡君 · 昨日" },
+          "en": { title: "Lin Hsiu-Chin · family reply", meta: "Message from Yi-Chun Lin · yesterday" }
+        },
+        networkLabel: { "zh-Hant": "服務進度穩定", "en": "Service on track" },
+        strip: { visits: 3, signals: 1, messages: 2 },
+        needs: [
+          { status: "attention", icon: "family", title: { "zh-Hant": "林秀琴 · family reply", "en": "Lin Hsiu-Chin · family reply" }, meta: { "zh-Hant": "昨日 20:42 · 1 則待回覆", "en": "Yesterday 20:42 · 1 message waiting" } }
+        ],
+        timeline: [
+          { iso: "2026-09-24T08:42:00+08:00", type: "vital", status: "healthy", title: { "zh-Hant": "早晨量測已完成", "en": "Morning vitals recorded" }, copy: { "zh-Hant": "血壓 128 / 76 · 體溫 36.5°C · 狀態平穩", "en": "Blood pressure 128/76 · temperature 36.5°C · stable" }, tag: "vital", recordedBy: { initials: "YW", names: { "zh-Hant": "王怡文", "en": "Yi-Wen Wang" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-vitals" },
+          { iso: "2026-09-24T08:10:00+08:00", type: "service", status: "service", title: { "zh-Hant": "照服員已到達", "en": "Caregiver check-in" }, copy: { "zh-Hant": "王怡文完成打卡，開始今日陪伴服務。", "en": "Yi-Wen Wang checked in; morning care has started." }, tag: "service", recordedBy: { initials: "YW", names: { "zh-Hant": "王怡文", "en": "Yi-Wen Wang" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-note" },
+          { iso: "2026-09-23T20:42:00+08:00", type: "family", status: "family", title: { "zh-Hant": "家屬留下新訊息", "en": "Family note received" }, copy: { "zh-Hant": "林怡君：媽媽昨晚睡得比較好，麻煩今天留意早餐。", "en": "Yi-Chun Lin: Mum slept better last night — please keep an eye on breakfast." }, tag: "family", recordedBy: { initials: "YL", names: { "zh-Hant": "林怡君", "en": "Yi-Chun Lin" }, role: { "zh-Hant": "家屬", "en": "Family" } }, source: "family-app", confidence: "verified", action: "reply" },
+          { iso: "2026-09-23T07:55:00+08:00", type: "alert", status: "attention", title: { "zh-Hant": "晚間巡視：陪伴情緒偏低落", "en": "Evening visit: low mood observed" }, copy: { "zh-Hant": "王怡文：晚間陪伴情緒偏低落，已記錄並提醒家屬。", "en": "Yi-Wen Wang: low mood during evening visit; logged and family notified." }, tag: "alert", recordedBy: { initials: "YW", names: { "zh-Hant": "王怡文", "en": "Yi-Wen Wang" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "pending", action: "view-note" },
+          { iso: "2026-09-22T08:30:00+08:00", type: "vital", status: "healthy", title: { "zh-Hant": "昨日量測已歸檔", "en": "Yesterday's vitals filed" }, copy: { "zh-Hant": "血壓 130 / 78 · 體溫 36.4°C · 落在個人平日範圍。", "en": "Blood pressure 130/78 · temperature 36.4°C · within personal range." }, tag: "vital", recordedBy: { initials: "YW", names: { "zh-Hant": "王怡文", "en": "Yi-Wen Wang" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-vitals" }
+        ]
+      },
+      {
+        id: "chen", initials: { "zh-Hant": "陳", "en": "CM" }, portraitTone: "blue",
+        status: "action",
+        names: { "zh-Hant": { full: "陳明德", given: "明德", short: "明德" }, "en": { full: "Chen Ming-Te", given: "Ming-Te", short: "Ming-Te" } },
+        age: 81,
+        carePlan: { "zh-Hant": "居家照護 A 級", "en": "Home care · tier A" },
+        timezone: "Asia/Taipei",
+        family: [{ initials: "CH", names: { "zh-Hant": "陳志豪", "en": "Chih-Hao Chen" }, relation: { "zh-Hant": "兒子", "en": "Son" } }],
+        caregiver: { initials: "YJ", names: { "zh-Hant": "陳怡君", "en": "Yi-Chun Chen" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } },
+        next: { iso: "2026-09-24T08:30:00+08:00", durationMin: 60, status: "running",
+          focus: { "zh-Hant": "血壓覆核 + 用藥", "en": "BP review + medication" },
+          window: { "zh-Hant": "08:30 — 09:30", "en": "08:30 — 09:30" } },
+        nextReview: { "zh-Hant": "今日 14:00", "en": "Today · 14:00" },
+        queue: {
+          "zh-Hant": { title: "陳明德 · review vital", meta: "152 / 88 · 08:10 · 1 owner" },
+          "en": { title: "Chen Ming-Te · review vital", meta: "152/88 · 08:10 · 1 owner" }
+        },
+        networkLabel: { "zh-Hant": "1 項需覆核", "en": "1 item needs review" },
+        strip: { visits: 2, signals: 2, messages: 1 },
+        needs: [
+          { status: "action", icon: "vital", title: { "zh-Hant": "陳明德 · vital 需覆核", "en": "Chen Ming-Te · vital needs review" }, meta: { "zh-Hant": "08:10 · owner: 陳怡君", "en": "08:10 · owner: Yi-Chun Chen" } }
+        ],
+        timeline: [
+          { iso: "2026-09-24T08:10:00+08:00", type: "alert", status: "action", title: { "zh-Hant": "血壓紀錄待覆核", "en": "Blood pressure pending review" }, copy: { "zh-Hant": "陳怡君記錄 152 / 88，尚未完成主管覆核。", "en": "Yi-Chun Chen logged 152/88; supervisor review is pending." }, tag: "alert", recordedBy: { initials: "YJ", names: { "zh-Hant": "陳怡君", "en": "Yi-Chun Chen" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "pending", action: "review" },
+          { iso: "2026-09-24T07:45:00+08:00", type: "service", status: "service", title: { "zh-Hant": "照服員已到達", "en": "Caregiver check-in" }, copy: { "zh-Hant": "陳怡君完成打卡，開始晨間照護。", "en": "Yi-Chun Chen checked in; morning care has started." }, tag: "service", recordedBy: { initials: "YJ", names: { "zh-Hant": "陳怡君", "en": "Yi-Chun Chen" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-note" },
+          { iso: "2026-09-23T19:08:00+08:00", type: "family", status: "family", title: { "zh-Hant": "家屬已讀照護摘要", "en": "Family read daily summary" }, copy: { "zh-Hant": "陳志豪已查看昨日服務與量測紀錄。", "en": "Chih-Hao Chen read yesterday's service and vitals summary." }, tag: "family", recordedBy: { initials: "CH", names: { "zh-Hant": "陳志豪", "en": "Chih-Hao Chen" }, role: { "zh-Hant": "家屬", "en": "Family" } }, source: "family-app", confidence: "verified", action: "view-loop" }
+        ]
+      },
+      {
+        id: "huang", initials: { "zh-Hant": "黃", "en": "HM" }, portraitTone: "lavender",
+        status: "healthy",
+        names: { "zh-Hant": { full: "黃蔡美", given: "蔡美", short: "蔡美" }, "en": { full: "Huang Tsai-Mei", given: "Tsai-Mei", short: "Tsai-Mei" } },
+        age: 75,
+        carePlan: { "zh-Hant": "居家照護 B 級", "en": "Home care · tier B" },
+        timezone: "Asia/Taipei",
+        family: [{ initials: "YW", names: { "zh-Hant": "黃郁雯", "en": "Yu-Wen Huang" }, relation: { "zh-Hant": "女兒", "en": "Daughter" } }],
+        caregiver: { initials: "LH", names: { "zh-Hant": "林慧珍", "en": "Hui-Chen Lin" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } },
+        next: { iso: "2026-09-24T11:00:00+08:00", durationMin: 75, status: "confirmed",
+          focus: { "zh-Hant": "回診資料整理", "en": "Clinic paperwork" },
+          window: { "zh-Hant": "11:00 — 12:15", "en": "11:00 — 12:15" } },
+        nextReview: { "zh-Hant": "明日 09:00", "en": "Tomorrow · 09:00" },
+        queue: {
+          "zh-Hant": { title: "黃蔡美 · 11:00 服務", meta: "下一個服務：回診資料" },
+          "en": { title: "Huang Tsai-Mei · 11:00 visit", meta: "Next: clinic paperwork" }
+        },
+        networkLabel: { "zh-Hant": "下一個服務 11:00", "en": "Next service 11:00" },
+        strip: { visits: 1, signals: 0, messages: 1 },
+        needs: [],
+        timeline: [
+          { iso: "2026-09-24T07:30:00+08:00", type: "family", status: "family", title: { "zh-Hant": "家屬更新照護備註", "en": "Family note added" }, copy: { "zh-Hant": "今天上午需要協助整理回診資料。", "en": "Clinic paperwork requested for this morning." }, tag: "family", recordedBy: { initials: "YW", names: { "zh-Hant": "黃郁雯", "en": "Yu-Wen Huang" }, role: { "zh-Hant": "家屬", "en": "Family" } }, source: "family-app", confidence: "verified", action: "view-note" },
+          { iso: "2026-09-23T16:00:00+08:00", type: "service", status: "service", title: { "zh-Hant": "昨日服務已完成", "en": "Yesterday's service completed" }, copy: { "zh-Hant": "陪同散步 20 分鐘，情緒穩定。", "en": "20-minute walk completed; mood stable." }, tag: "service", recordedBy: { initials: "LH", names: { "zh-Hant": "林慧珍", "en": "Hui-Chen Lin" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-note" }
+        ]
+      },
+      {
+        id: "wu", initials: { "zh-Hant": "吳", "en": "WK" }, portraitTone: "green",
+        status: "healthy",
+        names: { "zh-Hant": { full: "吳國華", given: "國華", short: "國華" }, "en": { full: "Wu Kuo-Hua", given: "Kuo-Hua", short: "Kuo-Hua" } },
+        age: 83,
+        carePlan: { "zh-Hant": "居家照護 B 級", "en": "Home care · tier B" },
+        timezone: "Asia/Taipei",
+        family: [{ initials: "SL", names: { "zh-Hant": "吳秀蘭", "en": "Hsiu-Lan Wu" }, relation: { "zh-Hant": "太太", "en": "Spouse" } }],
+        caregiver: { initials: "CT", names: { "zh-Hant": "蔡婷婷", "en": "Ting-Ting Tsai" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } },
+        next: { iso: "2026-09-24T13:30:00+08:00", durationMin: 60, status: "confirmed",
+          focus: { "zh-Hant": "午餐 + 陪同復健", "en": "Lunch + rehab support" },
+          window: { "zh-Hant": "13:30 — 14:30", "en": "13:30 — 14:30" } },
+        nextReview: { "zh-Hant": "週五 10:00", "en": "Friday · 10:00" },
+        queue: {
+          "zh-Hant": { title: "吳國華 · 今日無警示", meta: "穩定進度 · 13:30 服務" },
+          "en": { title: "Wu Kuo-Hua · no alerts", meta: "Stable · 13:30 service" }
+        },
+        networkLabel: { "zh-Hant": "今日無警示", "en": "All clear today" },
+        strip: { visits: 1, signals: 0, messages: 0 },
+        needs: [],
+        timeline: [
+          { iso: "2026-09-24T08:00:00+08:00", type: "service", status: "service", title: { "zh-Hant": "早晨服務已完成", "en": "Morning service completed" }, copy: { "zh-Hant": "完成盥洗、早餐與環境整理。", "en": "Bathing, breakfast, and environment reset completed." }, tag: "service", recordedBy: { initials: "CT", names: { "zh-Hant": "蔡婷婷", "en": "Ting-Ting Tsai" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-note" },
+          { iso: "2026-09-23T08:30:00+08:00", type: "vital", status: "healthy", title: { "zh-Hant": "昨日量測已歸檔", "en": "Yesterday's vitals filed" }, copy: { "zh-Hant": "血壓與體溫在個人平日範圍。", "en": "Blood pressure and temperature within personal range." }, tag: "vital", recordedBy: { initials: "CT", names: { "zh-Hant": "蔡婷婷", "en": "Ting-Ting Tsai" }, role: { "zh-Hant": "照服員", "en": "Caregiver" } }, source: "mobile-app", confidence: "verified", action: "view-vitals" }
+        ]
+      }
+    ];
+
+    /* ---------------- State ---------------- */
+    let currentLocale = "zh-Hant";
+    let currentRole = "manager";
+    let currentView = "overview";
+    let selectedResident = "lin";
+    let currentFilter = "all";
+
+    /* ---------------- Helpers ---------------- */
+    const t = (path, vars) => {
+      const parts = path.split(".");
+      let node = i18n[currentLocale];
+      for (const p of parts) node = node?.[p];
+      if (typeof node === "string" && vars) {
+        return node.replace(/\{\{(\w+)\}\}/g, (_, k) => (vars[k] != null ? String(vars[k]) : ""));
+      }
+      return node == null ? "" : node;
+    };
+    const tzNowParts = () => {
+      const fmt = new Intl.DateTimeFormat("en-CA", { timeZone: WORKSPACE_TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
+      const parts = fmt.formatToParts(new Date());
+      const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+      return { date: `${map.year}-${map.month}-${map.day}`, time: `${map.hour}:${map.minute}` };
+    };
+    const formatTime = iso => {
+      const dt = new Date(iso);
+      return new Intl.DateTimeFormat(currentLocale, { hour: "numeric", minute: "2-digit", hour12: i18n[currentLocale].hour12, timeZone: WORKSPACE_TZ }).format(dt);
+    };
+    const formatDate = iso => {
+      const dt = new Date(iso);
+      return new Intl.DateTimeFormat(currentLocale, { month: "short", day: "numeric", timeZone: WORKSPACE_TZ }).format(dt);
+    };
+    const formatCount = n => new Intl.NumberFormat(currentLocale).format(n);
+    const formatPct = n => new Intl.NumberFormat(currentLocale, { style: "percent", maximumFractionDigits: 0 }).format(n / 100);
+    const residentById = id => residents.find(r => r.id === id) || residents[0];
+    const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+    /* ---------------- Renderers ---------------- */
+    function applyStaticLabels() {
+      document.documentElement.lang = currentLocale;
+      document.documentElement.dataset.locale = currentLocale;
+      document.title = `Careboard — 長照安心管家 M1 Prototype · ${i18n[currentLocale].localeName}`;
+      const setText = (sel, value) => { const el = document.querySelector(sel); if (el) el.textContent = value; };
+      setText("#brand-name", "長照安心管家");
+      setText("#org-name", t("workspace.name"));
+      setText("#org-tag", t("workspace.tagline"));
+      setText("#crumb-workspace", t("workspace.name"));
+      const viewKey = currentView;
+      setText("#crumb-view", t(`crumbs.${viewKey}`));
+      setText("#tz-label", t("tzLabel"));
+      setText("#sync-headline", t("sync.headline"));
+      setText("#sync-time", t("sync.meta"));
+      setText("#rail-env-title", t("modal.title").includes("預覽") || currentLocale === "zh-Hant" ? (currentLocale === "zh-Hant" ? "可安心瀏覽" : "Safe to explore") : "Safe to explore");
+      setText("#rail-env-copy", currentLocale === "zh-Hant" ? "僅展示資料；不會離開這個工作區。" : "Mock data only. Nothing leaves this workspace.");
+      setText("#rail-env-badge", t("sync.state"));
+      setText("#queue-headline", t("queue.items", { n: formatCount(2) }));
+      setText("#queue-link", t("queue.link"));
+      setText("#hero-eyebrow", t(`hero.${currentRole}.eyebrow`));
+      document.getElementById("hero-title").innerHTML = t(`hero.${currentRole}.greeting`);
+      setText("#hero-copy", t(`hero.${currentRole}.lead`));
+      setText("#pulse-pct", formatPct(78));
+      setText("#pulse-visits", `${formatCount(5)} / ${formatCount(8)}`);
+      setText("#pulse-review", formatCount(1));
+      setText("#pulse-family", formatCount(2));
+      setText("#pulse-signals", "+" + formatCount(1));
+      setText("#legend-title", t("legend.title"));
+      setText("#timeline-heading", t("chronology.title"));
+      setText("#timeline-live", t("chronology.live"));
+      setText("#modal-title", t("modal.title"));
+      setText("#modal-copy", t("modal.copy"));
+      setText("#modal-warning-title", t("modal.warningTitle"));
+      setText("#modal-warning-copy", t("modal.warningCopy"));
+      // translate any [data-i18n] placeholders
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+        const value = t(key);
+        if (value) {
+          // Preserve HTML for keys known to contain markup
+          if (key === `hero.${currentRole}.greeting`) {
+            // already handled
+          } else if (el.querySelector("*")) {
+            // skip composite nodes; rely on children
+          } else {
+            el.textContent = value;
+          }
+        }
+      });
+      const select = document.getElementById("locale-select");
+      if (select.value !== currentLocale) select.value = currentLocale;
+      const roleSelect = document.getElementById("role-select");
+      if (roleSelect.value !== currentRole) roleSelect.value = currentRole;
+    }
+
+    function renderResident() {
+      const r = residentById(selectedResident);
+      document.getElementById("resident-portrait").textContent = r.initials[currentLocale];
+      document.getElementById("resident-portrait").className = `person-avatar ${r.portraitTone}`;
+      const meta = `${formatCount(r.age)} · ${t("dock.next.title") === "Next service" ? r.carePlan["en"] : r.carePlan["zh-Hant"]}`;
+      document.getElementById("resident-meta").textContent = meta;
+      const stateEl = document.getElementById("resident-state");
+      stateEl.textContent = t(`status.${r.status}`);
+      stateEl.className = `state-pill ${r.status}`;
+      document.getElementById("resident-name").textContent = r.names[currentLocale].full;
+      document.getElementById("resident-family").textContent = `${formatCount(r.family.length)} ${currentLocale === "zh-Hant" ? "位家屬" : "members"}`;
+      document.getElementById("resident-review").textContent = r.nextReview[currentLocale];
+      document.getElementById("resident-visits").textContent = formatCount(r.strip.visits);
+      document.getElementById("resident-signals").textContent = formatCount(r.strip.signals);
+      document.getElementById("resident-msgs").textContent = formatCount(r.strip.messages);
+      document.getElementById("resident-strip").closest(".dock-card").querySelector(".panel-head").style.display = "none";
+
+      const subtitle = t("chronology.subtitle", { name: r.names[currentLocale].full });
+      document.getElementById("timeline-subtitle").textContent = subtitle;
+      document.getElementById("dock-next-when").textContent = t("dock.next.when", { n: formatCount(38) });
+      document.getElementById("dock-next-state").textContent = t("nextSlot." + r.next.status);
+      document.getElementById("dock-next-status").textContent = t("nextSlot." + r.next.status);
+      document.getElementById("dock-next-time").textContent = formatTime(r.next.iso);
+      document.getElementById("dock-next-window").textContent = r.next.window[currentLocale];
+      document.getElementById("dock-next-window-2").textContent = r.next.window[currentLocale];
+      document.getElementById("dock-next-resident").textContent = `${r.names[currentLocale].full} · ${t("legend.title") === "Status legend" ? "home care" : "居家照護"}`;
+      document.getElementById("dock-next-caregiver").textContent = `${r.caregiver.names[currentLocale]} · ${r.caregiver.role[currentLocale]}`;
+      document.getElementById("dock-next-portrait").textContent = r.initials[currentLocale];
+      document.getElementById("dock-next-portrait").className = `person-avatar ${r.portraitTone}`;
+      document.getElementById("dock-next-focus").textContent = r.next.focus[currentLocale];
+
+      const queue1 = document.getElementById("queue-1-title");
+      const queue1Meta = document.getElementById("queue-1-meta");
+      const queue2 = document.getElementById("queue-2-title");
+      const queue2Meta = document.getElementById("queue-2-meta");
+      const queueItems = residents.slice(0, 2).map((x, i) => x.queue[currentLocale]);
+      if (queueItems[0]) { queue1.textContent = queueItems[0].title; queue1Meta.textContent = queueItems[0].meta; }
+      if (queueItems[1]) { queue2.textContent = queueItems[1].title; queue2Meta.textContent = queueItems[1].meta; }
+
+      const dockNeeds = document.getElementById("dock-needs-count");
+      const totalNeeds = residents.reduce((acc, x) => acc + x.needs.length, 0);
+      dockNeeds.textContent = t("dock.needs.count", { n: formatCount(totalNeeds) });
+      const dockNetwork = document.getElementById("dock-network-count");
+      dockNetwork.textContent = t("dock.network.count", { n: formatCount(residents.length) });
+
+      const attention = document.getElementById("attention-list");
+      const allNeeds = residents.flatMap(x => x.needs.map(n => ({ ...n, who: x.names[currentLocale].full })));
+      attention.innerHTML = allNeeds.length ? allNeeds.map(n => {
+        const iconBg = n.icon === "vital" ? "var(--accent-soft)" : n.icon === "family" ? "var(--family-soft)" : "var(--attention-soft)";
+        const iconColor = n.icon === "vital" ? "var(--accent)" : n.icon === "family" ? "var(--family)" : "var(--attention)";
+        return `<div class="attention-item"><i class="attention-bullet ${n.status}" aria-hidden="true"></i><div class="attention-body"><strong>${escapeHtml(n.title[currentLocale])}</strong><span>${escapeHtml(n.meta[currentLocale])}</span></div></div>`;
+      }).join("") : `<p class="visually-hidden" data-i18n="empty">${escapeHtml(t("empty"))}</p><p style="color:var(--muted-light);font-size:11px;padding:6px 0;">${escapeHtml(t("empty"))}</p>`;
+
+      const network = document.getElementById("network-list");
+      network.innerHTML = residents.map(client => `<button class="network-person ${client.id === selectedResident ? "selected" : ""}" data-client="${client.id}" type="button"><span class="network-meta"><span class="person-avatar ${client.portraitTone}" aria-hidden="true">${escapeHtml(client.initials[currentLocale])}</span><div><strong>${escapeHtml(client.names[currentLocale].full)}</strong><small>${escapeHtml(client.networkLabel[currentLocale])}</small></div></span><span class="check" aria-hidden="true">${client.id === selectedResident ? "●" : "○"}</span></button>`).join("");
+      network.querySelectorAll("[data-client]").forEach(button => button.addEventListener("click", () => {
+        selectedResident = button.dataset.client;
+        renderResident();
+        renderTimeline();
+      }));
+    }
+
+    function renderTimeline() {
+      const r = residentById(selectedResident);
+      const filters = ["all", "service", "vital", "family", "alert"];
+      filters.forEach(f => {
+        const count = f === "all" ? r.timeline.length : r.timeline.filter(i => i.type === f).length;
+        document.getElementById(`count-${f}`).textContent = formatCount(count);
+      });
+      const items = r.timeline.filter(i => currentFilter === "all" || i.type === currentFilter);
+      const timeline = document.getElementById("timeline");
+      timeline.setAttribute("aria-busy", "true");
+      const todayKey = tzNowParts().date;
+      timeline.innerHTML = items.length ? items.map(item => {
+        const isToday = item.iso.slice(0, 10) === todayKey;
+        const dateLabel = isToday ? formatTime(item.iso) : formatDate(item.iso);
+        const time = isToday ? formatTime(item.iso) : formatDate(item.iso);
+        const timeSub = isToday ? "" : formatTime(item.iso);
+        const statusKey = item.status || item.type;
+        const byLabel = t("syncMeta.by", { role: escapeHtml(item.recordedBy.role[currentLocale]), name: escapeHtml(item.recordedBy.names[currentLocale]) });
+        const sourceLabel = t("sources." + item.source);
+        const confidenceLabel = t("confidence." + item.confidence);
+        const confidenceTone = item.confidence === "verified" ? "verified" : "pending";
+        const tagLabel = t("tags." + item.tag);
+        return `<article class="timeline-item"><time class="timeline-time" datetime="${item.iso}">${time}${timeSub ? `<small>${timeSub}</small>` : ""}</time><div class="timeline-line"><span class="timeline-icon ${statusKey}" aria-hidden="true">${statusKey === "family" ? "F" : statusKey === "vital" ? "V" : statusKey === "alert" ? "!" : "S"}</span></div><div class="timeline-body"><div class="timeline-title">${escapeHtml(item.title[currentLocale])}<span class="tag ${item.type === "alert" ? "attention" : item.type}">${escapeHtml(tagLabel)}</span></div><p class="timeline-copy">${escapeHtml(item.copy[currentLocale])}</p><div class="timeline-meta" aria-label="Provenance"><span class="meta-row"><span class="avatar-chip" aria-hidden="true">${escapeHtml(item.recordedBy.initials)}</span><span>${byLabel}</span></span><span class="source-tag ${confidenceTone}">${escapeHtml(confidenceLabel)}</span><span class="source-tag">${escapeHtml(sourceLabel)}</span></div></div><button class="timeline-action" type="button" data-action="${item.action}">${escapeHtml(t("actions." + item.action))}</button></article>`;
+      }).join("") : `<p style="color:var(--muted-light);font-size:12px;padding:24px 0;">${escapeHtml(t("empty"))}</p>`;
+      timeline.querySelectorAll("[data-action]").forEach(button => button.addEventListener("click", () => {
+        button.textContent = t("actions.handled");
+        button.classList.add("done");
+      }));
+      timeline.setAttribute("aria-busy", "false");
+    }
+
+    function renderAll() {
+      applyStaticLabels();
+      renderResident();
+      renderTimeline();
+    }
+
+    /* ---------------- Events ---------------- */
+    document.querySelectorAll(".filter").forEach(button => button.addEventListener("click", () => {
+      document.querySelectorAll(".filter").forEach(item => item.classList.remove("active"));
+      button.classList.add("active");
+      button.setAttribute("aria-selected", "true");
+      currentFilter = button.dataset.filter;
+      renderTimeline();
+      // Keep sibling filters aria-selected in sync
+      document.querySelectorAll(".filter").forEach(item => {
+        if (item !== button) item.setAttribute("aria-selected", "false");
+      });
+    }));
+
+    function switchView(view) {
+      currentView = view;
+      document.querySelectorAll("[data-view]").forEach(item => item.classList.toggle("active", item.dataset.view === view));
+      document.getElementById("crumb-view").textContent = t(`crumbs.${view}`);
+    }
+    document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
+
+    document.getElementById("locale-select").addEventListener("change", event => {
+      currentLocale = event.target.value;
+      renderAll();
+    });
+
+    document.getElementById("role-select").addEventListener("change", event => {
+      currentRole = event.target.value;
+      // Role-aware: when in caregiver or family, lock the network to the assigned resident
+      if (currentRole === "family") selectedResident = "lin";
+      if (currentRole === "caregiver") selectedResident = "lin";
+      renderAll();
+    });
+
+    const modal = document.getElementById("sos-modal");
+    const openModal = () => modal.classList.add("open");
+    const closeModal = () => modal.classList.remove("open");
+    document.getElementById("sos-button-main").addEventListener("click", openModal);
+    document.getElementById("sos-button-mobile")?.addEventListener("click", openModal);
+    document.getElementById("close-modal").addEventListener("click", closeModal);
+    document.getElementById("preview-next").addEventListener("click", event => {
+      event.currentTarget.lastElementChild.textContent = t("modal.previewed");
+    });
+    modal.addEventListener("click", event => { if (event.target === modal) closeModal(); });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modal.classList.contains("open")) {
+        closeModal();
+        document.getElementById("sos-button-main").focus();
+      }
+      if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && document.activeElement?.classList?.contains("filter")) {
+        const filters = Array.from(document.querySelectorAll(".filter"));
+        const idx = filters.indexOf(document.activeElement);
+        const next = event.key === "ArrowRight" ? (idx + 1) % filters.length : (idx - 1 + filters.length) % filters.length;
+        filters[next].focus();
+        filters[next].click();
+        event.preventDefault();
+      }
+    });
+
+    document.getElementById("new-note").addEventListener("click", event => {
+      event.currentTarget.firstChild.textContent = "✓ " + t("heroActions.secondary");
+      event.currentTarget.setAttribute("aria-label", t("actions.handled"));
+    });
+
+    document.getElementById("queue-link").addEventListener("click", event => {
+      event.currentTarget.textContent = "→ " + t("queue.link");
+      switchView("people");
+    });
+
+    renderAll();
     </script>
   </body>
 </html>
