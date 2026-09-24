@@ -11,7 +11,7 @@
 
 | 來源 | SHA / 結果 |
 |---|---|
-| Local HEAD | `8a0a41a` (`feat(m1): implement mock-only careboard workspace`) |
+| Local HEAD | `HEAD` (see `git log -1`; M1 implementation commit `8a0a41a`) |
 | GitHub `main` | `02db3c96272563772d3ed1c3c70c735420e5625a` |
 | Notion canonical Project row | `02db3c96272563772d3ed1c3c70c735420e5625a` |
 | Vercel production | 未驗證：本次沒有 `VERCEL_TOKEN` |
