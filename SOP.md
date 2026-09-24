@@ -3,7 +3,7 @@
 ## 規格對齊狀態（2026-09-24）
 
 - ✅ `PRD/SPEC.md` v3.0.2 已在 repo。
-- ✅ GitHub `main`、本地 checkout 與 Notion canonical Project row 目前都指向 `02db3c96272563772d3ed1c3c70c735420e5625a`。
+- ⚠️ GitHub `main` 與 Notion canonical Project row 仍指向 `02db3c96272563772d3ed1c3c70c735420e5625a`；本地 M1 commit 已前進，尚未 push 或同步 release metadata。
 - ⚠️ Vercel URL 已記錄為 `https://long-term-care.vercel.app`，但本次無 `VERCEL_TOKEN`，尚未完成 production SHA / HTTP 驗證。
 - ✅ M1 mock-only React 工作台已實作 FR-001～FR-007 的前端可演示流程；未接真實個資、通知、電話或雲端服務。
 - ⚠️ 尚未完成 production DoD：沒有真實 auth/RBAC、加密同步、外部通知、E2E、CI 對齊或 Vercel release。
