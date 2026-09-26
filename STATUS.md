@@ -49,3 +49,11 @@ Prototype static check：exit 0（required markers、inline JavaScript parse、`
 - 程式碼完成度：M1 mock-only frontend complete；外部服務與 production safety 尚未完成。
 - Open Issues：CI path、integration/E2E、auth/RBAC、加密同步、外部通知與 deployment release gate（見 `SOP.md`）。
 - 下一步：Sean 覆審正式 React 工作台；若要 production 化，再由 Planner 建立安全／權限／整合規格並進行人審。
+
+## Independent QA evidence（2026-09-27）
+
+- MiniMax 外派變更已落在本專案工作樹；目前尚未產生新 commit、push 或 deployment。
+- Deterministic checks：`npm run lint` exit 0、`npm run typecheck` exit 0、`npm test` exit 0（13 tests passed）、`npm run build` exit 0、`git diff --check` exit 0。
+- Browser smoke QA：FR-001～FR-007 導覽、角色切換（照服員／家屬）、個案搜尋、敏感欄位遮罩／還原均通過；console error/warning 皆為 0。
+- 修正 `.github/workflows/ci.yml` 的 `web/` 工作目錄與 lockfile cache 路徑，避免 root 沒有 `package.json` 導致 CI 失敗。
+- 尚未宣稱 production acceptance：專案仍沒有 automated E2E、真實 auth/RBAC、外部通知、三向 SHA 對齊或 release metadata 同步。
