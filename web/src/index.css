@@ -3,8 +3,6 @@
    React shell keeps the same editorial visual language. No real data,
    notifications, calls, or third-party services are wired up. */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap');
-
 :root {
   /* Editorial, non-pastel palette */
   --ink: #0e1a24;
@@ -213,6 +211,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 42px;
   padding: 10px 12px;
   border-radius: 9px;
   color: #a8b8c4;
@@ -234,6 +233,12 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   color: currentColor;
   font-size: 14px;
   font-weight: 700;
+}
+.nav button span:not(.glyph) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .nav .nav-count {
   margin-left: auto;
@@ -2099,21 +2104,12 @@ h1 span { color: var(--accent-strong); }
   .pulse-strip { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 1080px) {
-  .product-shell { grid-template-columns: 78px minmax(0, 1fr); }
-  .rail { align-items: center; padding-inline: 12px; }
-  .brand { padding-inline: 0; justify-content: center; }
-  .brand > div:not(.brand-mark),
-  .org-switch .org-meta,
-  .org-switch .chev,
-  .rail-label,
-  .nav button span:not(.glyph),
-  .rail-divider,
-  .rail-status { display: none; }
-  .org-switch { width: 36px; height: 36px; justify-content: center; padding: 0; margin-bottom: 20px; }
-  .org-switch .org-mark { width: 26px; }
-  .nav { width: 100%; }
-  .nav button { justify-content: center; padding-inline: 0; }
+@media (max-width: 980px) {
+  .product-shell { grid-template-columns: 224px minmax(0, 1fr); }
+  .rail { padding: 22px 12px 18px; }
+  .brand { padding-inline: 6px; padding-bottom: 22px; }
+  .org-switch { margin-inline: 0; margin-bottom: 22px; }
+  .nav button { padding-inline: 11px; }
   .hero { grid-template-columns: minmax(0, 1fr) 240px; padding: 26px 26px; }
   .focus-queue { grid-template-columns: 1fr 1fr; }
   .queue-intro { grid-column: span 2; border-right: 0; border-bottom: 1px solid var(--line-on-light); }

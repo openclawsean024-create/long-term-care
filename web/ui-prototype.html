@@ -6,9 +6,6 @@
     <meta name="theme-color" content="#0e1a24" />
     <meta name="description" content="Careboard prototype for long-term care operations. International, locale-aware, mock-data only." />
     <title>Careboard — 長照安心管家 M1 Prototype</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;display=swap" />
     <style>
       :root{
         /* Editorial, non-pastel palette */
@@ -73,10 +70,11 @@
       .org-switch .chev{margin-left:auto;color:var(--muted-dark);font-size:11px}
       .rail-label{padding:0 11px 8px;color:var(--muted-dark);font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}
       .nav{display:grid;gap:3px}
-      .nav button{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:9px;color:#a8b8c4;background:transparent;text-align:left;transition:.18s ease}
+      .nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:42px;padding:10px 12px;border-radius:9px;color:#a8b8c4;background:transparent;text-align:left;transition:.18s ease}
       .nav button:hover{color:white;background:var(--ink-3)}
       .nav button.active{color:var(--ink);background:var(--paper);font-weight:800}
       .glyph{display:grid;place-items:center;width:18px;color:currentColor;font-size:14px;font-weight:700}
+      .nav button span:not(.glyph){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       .rail-divider{height:1px;margin:24px 10px 20px;background:var(--line-on-dark)}
       .rail-status{margin-top:auto;padding:14px;border:1px solid var(--line-on-dark);border-radius:13px;background:var(--ink-2)}
       .rail-status .status-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted-dark);font-size:9px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
@@ -300,15 +298,12 @@
       @media (max-width:1180px){
         .pulse-strip{grid-template-columns:repeat(2,1fr)}
       }
-      @media (max-width:1080px){
-        .product-shell{grid-template-columns:78px minmax(0,1fr)}
-        .rail{align-items:center;padding-inline:12px}
-        .brand{padding-inline:0;justify-content:center}
-        .brand > div:not(.brand-mark),.org-switch .org-meta,.org-switch .chev,.rail-label,.nav button span:not(.glyph),.rail-divider,.rail-status{display:none}
-        .org-switch{width:36px;height:36px;justify-content:center;padding:0;margin-bottom:20px}
-        .org-switch .org-mark{width:26px}
-        .nav{width:100%}
-        .nav button{justify-content:center;padding-inline:0}
+      @media (max-width:980px){
+        .product-shell{grid-template-columns:224px minmax(0,1fr)}
+        .rail{padding:22px 12px 18px}
+        .brand{padding-inline:6px;padding-bottom:22px}
+        .org-switch{margin-inline:0;margin-bottom:22px}
+        .nav button{padding-inline:11px}
         .hero{grid-template-columns:minmax(0,1fr) 240px;padding:26px 26px}
         .focus-queue{grid-template-columns:1fr 1fr}
         .queue-intro{grid-column:span 2;border-right:0;border-bottom:1px solid var(--line-on-light)}

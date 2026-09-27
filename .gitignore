@@ -6,3 +6,4 @@ dist/
 *.log
 .vite/
 web/dist/
+web/test-results/

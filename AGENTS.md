@@ -23,11 +23,11 @@
 | 類型 | Canonical command | 現況 |
 |---|---|---|
 | Format | 尚未設定 | M1 前補上 formatter policy |
-| Lint | `npm run lint` | 尚未在 `web/package.json` 定義，禁止假設已通過 |
+| Lint | `npm run lint` | 已定義 |
 | Typecheck | `npm run typecheck` | 已定義 |
-| Unit | `npm test` | 已定義，但目前沒有測試檔 |
+| Unit | `npm test` | 已定義；17 domain tests |
 | Integration | 尚未設定 | M2 前定義 |
-| E2E | 尚未設定 | P0 UI 完成前定義 |
+| E2E | `npm run e2e` | 已定義；Playwright + Chromium，5 browser tests |
 | Build | `npm run build` | 已定義 |
 
 部署由 release workflow 管理；在未完成獨立驗收與風險審查前，不得執行 production deploy。任何正式 release 都必須同步 canonical Notion Project DB，並以 60 秒 production HTTP smoke test 驗證。
@@ -35,4 +35,3 @@
 ## 4. Commit 規則
 
 使用 `<type>(scope): <FR / AC ref 或說明>`，例如 `chore(governance): add project operating contract`。
-

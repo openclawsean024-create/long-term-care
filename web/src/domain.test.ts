@@ -114,4 +114,49 @@ describe('careboard domain rules', () => {
     expect(shaped.carePlan['zh-Hant']).toBe('照護 1 級')
     expect(shaped.timeline).toEqual([])
   })
+
+  it('ignores same-window overlaps across different caregivers or different dates', () => {
+    const sameWindowDifferentCaregiver = [
+      { id: 'a', residentId: 'lin', caregiver: '王怡文', date: '2026-09-25', start: '09:00', end: '11:00', status: 'confirmed' as const },
+      { id: 'b', residentId: 'chen', caregiver: '張家豪', date: '2026-09-25', start: '09:00', end: '11:00', status: 'confirmed' as const },
+    ]
+    expect(findShiftConflicts(sameWindowDifferentCaregiver)).toEqual([])
+
+    const sameCaregiverDifferentDate = [
+      { id: 'c', residentId: 'lin', caregiver: '王怡文', date: '2026-09-25', start: '09:00', end: '11:00', status: 'confirmed' as const },
+      { id: 'd', residentId: 'lin', caregiver: '王怡文', date: '2026-09-26', start: '09:00', end: '11:00', status: 'confirmed' as const },
+    ]
+    expect(findShiftConflicts(sameCaregiverDifferentDate)).toEqual([])
+  })
+
+  it('flags three-way overlaps and back-to-back shifts correctly', () => {
+    const threeWay = [
+      { id: 'a', residentId: 'lin', caregiver: '王怡文', date: '2026-09-25', start: '09:00', end: '12:00', status: 'pending' as const },
+      { id: 'b', residentId: 'chen', caregiver: '王怡文', date: '2026-09-25', start: '10:00', end: '11:30', status: 'pending' as const },
+      { id: 'c', residentId: 'huang', caregiver: '王怡文', date: '2026-09-25', start: '11:00', end: '13:00', status: 'conflict' as const },
+    ]
+    expect(findShiftConflicts(threeWay).sort()).toEqual(['a', 'b', 'c'])
+
+    const backToBack = [
+      { id: 'a', residentId: 'lin', caregiver: '王怡文', date: '2026-09-25', start: '09:00', end: '11:00', status: 'confirmed' as const },
+      { id: 'b', residentId: 'lin', caregiver: '王怡文', date: '2026-09-25', start: '11:00', end: '13:00', status: 'confirmed' as const },
+    ]
+    expect(findShiftConflicts(backToBack)).toEqual([])
+  })
+
+  it('returns an empty string when no residents exist for caregiver or family roles', () => {
+    expect(selectResidentForRole('caregiver', [], 'lin')).toBe('lin')
+    expect(selectResidentForRole('family', [], 'anything')).toBe('lin')
+  })
+
+  it('produces deterministic empty resident defaults safe for new drafts', () => {
+    const a = emptyResident()
+    const b = emptyResident()
+    expect(a.id).toBe('')
+    expect(b.id).toBe('')
+    expect(a.timeline).toEqual([])
+    expect(a.needs).toEqual([])
+    expect(a.strip).toEqual({ visits: 0, signals: 0, messages: 0 })
+    expect(a.timezone).toBe('Asia/Taipei')
+  })
 })

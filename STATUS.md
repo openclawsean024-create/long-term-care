@@ -3,7 +3,7 @@
 - Project: 長照安心管家 — 居家照護 B2B2C SaaS
 - Repo: `openclawsean024-create/long-term-care`
 - Started: 2026-09-19（repo scaffold）
-- State: 🟡 **M1 MOCK-ONLY MVP / LOCAL AHEAD** — 2026-09-24
+- State: 🟡 **M1 MOCK-ONLY MVP / LOCAL AHEAD** — 2026-09-27
 - Spec: `PRD/SPEC.md` v3.0.2
 - Stack: Vite + React 19 + TypeScript strict + ESLint flat config
 
@@ -11,7 +11,7 @@
 
 | 來源 | SHA / 結果 |
 |---|---|
-| Local HEAD | `HEAD` (see `git log -1`; M1 implementation commit `8a0a41a`) |
+| Local HEAD | `e26e3f7`（目前工作樹另有未提交的 MiniMax／UI／E2E 變更） |
 | GitHub `main` | `02db3c96272563772d3ed1c3c70c735420e5625a` |
 | Notion canonical Project row | `02db3c96272563772d3ed1c3c70c735420e5625a` |
 | Vercel production | 未驗證：本次沒有 `VERCEL_TOKEN` |
@@ -29,14 +29,15 @@
 - 完成 React mock-only 工作台：角色切換、FR-001 個案 mock CRUD／敏感欄位遮罩、FR-002 排班衝突、FR-003 通知路由視圖、FR-004 local timeline、FR-005 用藥確認、FR-006 SOS 安全預覽、FR-007 報表。
 - 補上 domain unit tests、ESLint gate、React 19 依賴與 lockfile；本地瀏覽器 QA 驗證導覽、搜尋、個案切換與遮罩。
 
-## Deterministic checks（2026-09-24）
+## Deterministic checks（2026-09-27）
 
 | Command | Exit | Evidence |
 |---|---:|---|
 | `cd web && npm run lint` | 0 | ESLint 完成 |
 | `cd web && npm run typecheck` | 0 | React 19 / TypeScript strict 完成 |
-| `cd web && npm test` | 0 | 4 domain tests passed |
+| `cd web && npm test` | 0 | 17 domain tests passed |
 | `cd web && npm run build` | 0 | Vite production build 完成 |
+| `cd web && npm run e2e` | 0 | Playwright Chromium：5 tests passed |
 | `git diff --check` | 0 | whitespace check 完成 |
 | `sync-3way.sh long-term-care --verify` | 2 | 缺 `gh` CLI 與 `VERCEL_TOKEN`，資料不完整 |
 
@@ -46,14 +47,15 @@ Prototype static check：exit 0（required markers、inline JavaScript parse、`
 
 ## 完成度與風險
 
-- 程式碼完成度：M1 mock-only frontend complete；外部服務與 production safety 尚未完成。
-- Open Issues：CI path、integration/E2E、auth/RBAC、加密同步、外部通知與 deployment release gate（見 `SOP.md`）。
-- 下一步：Sean 覆審正式 React 工作台；若要 production 化，再由 Planner 建立安全／權限／整合規格並進行人審。
+- 程式碼完成度：M1 mock-only frontend + local browser gate 已完成；外部服務與 production safety 尚未完成。
+- Open Issues：CI E2E job 尚待 push 後實跑、integration、auth/RBAC、加密同步、外部通知與 deployment release gate（見 `SOP.md`）。
+- Final reviewer（2026-09-27）：`VERDICT: PASS`；AC-001～AC-006 的本地 M1 acceptance 與 deterministic evidence 足夠。
+- 下一步：若要 production 化，再由 Planner 建立安全／權限／整合規格並進行人審；release 前仍需 commit、push、CI／Vercel 與 Notion 三向同步。
 
 ## Independent QA evidence（2026-09-27）
 
-- MiniMax 外派變更已落在本專案工作樹；目前尚未產生新 commit、push 或 deployment。
-- Deterministic checks：`npm run lint` exit 0、`npm run typecheck` exit 0、`npm test` exit 0（13 tests passed）、`npm run build` exit 0、`git diff --check` exit 0。
-- Browser smoke QA：FR-001～FR-007 導覽、角色切換（照服員／家屬）、個案搜尋、敏感欄位遮罩／還原均通過；console error/warning 皆為 0。
+- MiniMax CLI Developer／Integrator 已新增 4 個 domain edge-case tests 與 Playwright browser gate；目前尚未產生新 commit、push 或 deployment。
+- 獨立重跑：`npm run lint`、`npm run typecheck`、`npm test`（17 tests）、`npm run build`、`npm run e2e`（5 tests）與 `git diff --check` 均 exit 0。
+- Browser gate 覆蓋角色切換、個案搜尋／選取／敏感欄位遮罩還原、日誌 CRUD、排班衝突與 SOS local-only preview；console error 與 page error 會使測試失敗。
 - 修正 `.github/workflows/ci.yml` 的 `web/` 工作目錄與 lockfile cache 路徑，避免 root 沒有 `package.json` 導致 CI 失敗。
-- 尚未宣稱 production acceptance：專案仍沒有 automated E2E、真實 auth/RBAC、外部通知、三向 SHA 對齊或 release metadata 同步。
+- 尚未宣稱 production acceptance：專案仍沒有真實 auth/RBAC、外部通知、CI E2E run 證據、三向 SHA 對齊或 release metadata 同步。
