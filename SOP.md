@@ -1,28 +1,34 @@
-# 長照安心管家 — 開發 SOP
+# 長照安心管家 — 開發與驗證 SOP
 
-## 規格對齊狀態（2026-09-27）
+> 狀態：文件依 `PRD/SPEC.md` v4.0 重建（2026-11-16）。M1 **建議暫緩，需 Sean 決定後才開發**（`GOAL.md`）。
 
-- ✅ `PRD/SPEC.md` v3.0.2 已在 repo。
-- ⚠️ GitHub `main` 與 Notion canonical Project row 仍指向 `02db3c96272563772d3ed1c3c70c735420e5625a`；本地 M1 commit 已前進，尚未 push 或同步 release metadata。
-- ⚠️ Vercel URL 已記錄為 `https://long-term-care.vercel.app`，但本次無 `VERCEL_TOKEN`，尚未完成 production SHA / HTTP 驗證。
-- ✅ M1 mock-only React 工作台已實作 FR-001～FR-007 的前端可演示流程；未接真實個資、通知、電話或雲端服務。
-- ⚠️ 尚未完成 production DoD：沒有真實 auth/RBAC、加密同步、外部通知、CI release 對齊或 Vercel release。
+## 1. 開工前
 
-## M1 — 可驗證產品骨架
+1. 讀 `AGENTS.md`、`GOAL.md`、`STATUS.md` 與 `PRD/SPEC.md` 的對應章節（§4 FR、§6 資料、§8 法規、§12 合併清單）。
+2. 確認這次的變更對應到哪一條 AC；不在 `GOAL.md` 內的需求先改 SPEC，並取得 Sean 同意。
+3. 從 `main` 開分支；所有指令都在 `web/` 目錄執行。
 
-目標：把 scaffold 變成可安全演示的照護工作台，不接真實個資與外部通知。
+## 2. 驗證指令（依 `web/package.json` 查證，2026-11-16）
 
-- 建立三種角色的最小導覽：照服員、家屬、個案管理師。
-- 先完成 FR-001 個案資料的 mock CRUD 與敏感欄位遮罩，不落真實資料。
-- 建立 FR-004 照護日誌的本地 mock timeline，明確標示 local-only。
-- 建立 FR-002 排班的週視圖骨架與衝突顯示；輪班建議先以 deterministic mock。
-- 每個 P0 行為都有 unit test；UI 互動補 E2E。
-- 在接入通知、用藥、SOS 前，先完成 threat model、權限模型、失敗降級與人審。
+| 類型 | 指令 | 狀態 | 備註 |
+|---|---|---|---|
+| 安裝 | `npm ci` | 已配置 | 使用 `web/package-lock.json` |
+| Lint | `npm run lint` | 已配置 | `eslint src`；目前不含 `e2e/` 與設定檔（AC-001 擴大範圍） |
+| Typecheck | `npm run typecheck` | 已配置 | `tsc --noEmit`；只涵蓋 `src`（AC-001 擴大範圍） |
+| Unit | `npm test` | 已配置 | `vitest run`；17 個 tests |
+| Build | `npm run build` | 已配置 | `tsc --noEmit && vite build` |
+| E2E | `npm run e2e` | 已配置 | Playwright Chromium；要先 `npm run build`（webServer 用 `vite preview`）；第一次需要 `npx playwright install chromium` |
+| 一次全跑 | `npm run check` | **尚未配置** | AC-001 新增 |
+| Format | — | **尚未配置** | — |
+| Integration | — | **尚未配置** | M2 |
+| Coverage | — | **尚未配置** | — |
+| Mobile E2E | — | **尚未配置** | SPEC §5 |
 
-## 驗證 SOP
+標準順序：
 
 ```bash
 cd web
+npm ci
 npm run lint
 npm run typecheck
 npm test
@@ -30,16 +36,43 @@ npm run build
 npm run e2e
 ```
 
-目前 integration 尚未配置；E2E 已以 Playwright + Chromium 配置，固定使用本機 Vite preview、`Asia/Taipei`、單 worker 與清空 localStorage 的 mock-only browser gate。不得把缺少 integration 命令當成通過。CI workflow 已改用 `web/` working directory，且 deploy job 必須等待 lint、unit、build、E2E 全部通過。
+尚未配置的指令不得宣稱已通過；不得把「沒有這個指令」當成通過。
 
-## 故意不做
+## 3. 資料安全檢查（每個 PR）
 
-- ❌ 醫療診斷、處方簽、DICOM 與保險請款。
-- ❌ 真實個案資料、真實推播／LINE／Email、真實電話輪撥。
-- ❌ 登入、RBAC、雲端資料庫或加密同步，直到安全設計與人審完成。
-- ❌ 生產部署、Vercel 設定與 GitHub workflow 修正，直到 M1 驗收並取得必要人審。
+```bash
+# 憑證樣式字串（應無結果）
+git grep -nIE "(sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{12,}|ghp_[A-Za-z0-9]{20,}|-----BEGIN)" -- web .github
+# 外部請求與撥號（M1 應無結果；AC-008）
+git grep -nE "tel:|fetch\(|sendBeacon|XMLHttpRequest|WebSocket|EventSource" -- web/src
+# CI 不吞錯（應無結果；AC-001）
+grep -nE "continue-on-error|\|\| echo|\|\| true" .github/workflows/ci.yml
+```
 
-## 已知 blocker
+AC-002 完成後，再加上 `npm test -- src/fixtures-safety.test.ts`（掃描假資料範圍以外的電話與地址）。
 
-- `web/` 的 React 19 與 SPEC 對齊；仍沒有 integration 設定。
-- GitHub Actions 的 E2E job 已接入，但需 push 後等待實際 workflow run；在 run 成功前不得宣稱 GHA 全綠或 production ready。
+## 4. CI
+
+- `.github/workflows/ci.yml`：`lint`（typecheck＋lint）、`test`、`build`、`e2e` 平行執行；`deploy` 要等四者都通過，並在 `main` push 時把 `web/dist` 推到 `gh-pages` 分支。
+- 最近一次 `main` run：`36297617070`（2026-09-27）全部成功。
+- GitHub Pages 目前未啟用（API 回 404），所以 `gh-pages` 分支沒有對外發布。是否啟用、以及 `deploy` 要不要改成手動觸發，由 Sean 決定（AC-001 建議改為手動）。
+
+## 5. 本機環境限制（2026-11-16 文件重建時）
+
+- 文件重建所用的 Mac 無法執行 `git`、`python3`，也沒有 node，所以本 SOP 的指令**未在本機執行**；狀態以 CI 紀錄為準。
+- 實作者在有 Node 22 的環境中要重跑全部指令，並把 exit code 記在 `STATUS.md`。
+
+## 6. 故意不做（M1）
+
+- 醫療判讀、劑量建議、設備串接。
+- 真實個資、真人照片、照片功能。
+- 真實通知、`tel:` 撥號、電話輪撥。
+- 後端、登入、雲端同步、加密（M2）。
+- 計費、長照 2.0 核銷或介接（M3 評估）。
+- 部署 production、啟用 Pages 或 Vercel、修改 repo 設定。
+
+## 7. 完成一個 AC 時
+
+1. 跑完 §2 的全部已配置指令與 §3 的檢查，記下 exit code。
+2. 更新 `STATUS.md` 的 FR 對照與 AC 進度。
+3. PR 標題用 `<type>(scope): AC-00x …`，內文附上指令結果與 CI run 連結。
